@@ -2,10 +2,12 @@ package com.example.project1.Dao;
 
 import com.example.project1.Entity.NewBook;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Mapper
+@Repository
 public class NewBookDao {
 
     @Update("update new_book set Title=#{title},=#{description} =#{price} =#{sellprice} where id=#{id}")
@@ -18,7 +20,7 @@ public class NewBookDao {
         return null;
     }
 
-    @Insert("insert into new_book(title,author,call_Number,barcode,exh_fr,exh_end,revise_date,act_yn) " +
+    @Insert("insert into new_book(title,author,description,price,sellprice) " +
             "values(#{title} =#{description} =#{price} =#{sellprice}")
     public int insertNewBook(NewBook entity) {
         return 0;

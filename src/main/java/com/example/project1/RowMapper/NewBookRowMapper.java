@@ -16,6 +16,7 @@ public class NewBookRowMapper implements RowMapper<NewBook> {
         newbook.setDescription(rs.getString("Description"));
         newbook.setPrice(rs.getInt("Price"));
         newbook.setSellprice(rs.getInt("Sellprice"));
+        newbook.setId(rs.getInt("book_id"));
 
         return newbook;
     }

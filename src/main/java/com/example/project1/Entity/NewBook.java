@@ -16,6 +16,7 @@ public class NewBook {
     @Id
     @Column(name = "book_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     public String getTitle() {
         return title;
@@ -55,6 +56,13 @@ public class NewBook {
 
     public void setSellprice(Integer sellprice) {
         this.sellprice = sellprice;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
     }
 
 }
