@@ -9,17 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 public class NewBookController {
     @Autowired
     private NewBookService newBookService;
 
     @PostMapping("/doUpdateNewBook")
-    public String doUpdateNewBook(NewBook entity){
+    public NewBook doUpdateNewBook(NewBook entity){
         newBookService.updateNewBook(entity);
-        return "redirect:/";
+        return entity;
     }
 
     @RequestMapping("/edit/{id}")
@@ -30,9 +28,9 @@ public class NewBookController {
     }
 
     @RequestMapping("/doSaveNewBook")
-    public String doSaveNewBook (NewBook entity) {
+    public NewBook doSaveNewBook (NewBook entity) {
         newBookService.saveNewBook(entity);
-        return "redirect:/";
+        return entity;
     }
 
     @RequestMapping("/new")
@@ -43,15 +41,15 @@ public class NewBookController {
     @RequestMapping("/delete/{id}")
     public String doDeleteById (@PathVariable Integer id) {
         newBookService.deleteById(id);
-        return "redirect:/";
+        return "delete";
     }
 
-    @RequestMapping("/")
+   /* @RequestMapping("/")
     public String doNewBookUI(Model model){
         List<NewBook> newBookList=newBookService.findNewBook();
         model.addAttribute("NewBookList", newBookList);
         return "index";
-    }
+    }*/
 
     @RequestMapping("/403")
     public String error403(){

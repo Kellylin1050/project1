@@ -9,4 +9,5 @@ public interface UserJwtRepository extends JpaRepository<User, String> {
     public static User findByUserNameAndPassword(String userName, String password) {
         return null;
     }
+
 }

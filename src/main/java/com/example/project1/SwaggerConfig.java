@@ -11,7 +11,7 @@ public class SwaggerConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("Public API")
-                .packagesToScan("com.example.project1.controller")
+                .packagesToScan("com.example.project1")
                 .build();
     }
 

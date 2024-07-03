@@ -7,13 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
 public class UserController {
     private UserService userService;
     private JwtGeneratorService jwtGeneratorService;
@@ -24,6 +21,11 @@ public class UserController {
         this.jwtGeneratorService=jwtGeneratorService;
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<User> findUser(User user){
+        userService.findUser();
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
     @PostMapping("/register")
     public ResponseEntity<?> postUser(@RequestBody User user){
         try{
@@ -49,4 +51,48 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
+
+    @PostMapping("/updateUser")
+    public ResponseEntity<User> doUpdateUser(User entity){
+        userService.updateUser(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+    }
+
+    @RequestMapping("/editUser/{id}")
+    public ResponseEntity<Object> dofindById(@PathVariable Integer id , Model model){
+        User user = userService.findById(id);
+        if (user == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        userService.updateUser(user);
+        User updatedUser =userService.findById(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+    }
+
+    @RequestMapping("/doSaveUser")
+    public User doSaveUser(User entity){
+        userService.saveUser(entity);
+        return entity;
+    }
+
+    @RequestMapping("/newUser")
+    public String doUserAddUI(){
+        return "User_adds";
+    }
+
+    @RequestMapping("/deleteUser/{id}")
+    public String dodeleteById(Integer id){
+        userService.deleteById(id);
+        return "delete";
+    }
+
+    @RequestMapping("/forgetpassword")
+    public String doresetPassword(String password){
+        userService.resetPassword(password);
+        return "password reset";
+    }
+
+
+
 }
