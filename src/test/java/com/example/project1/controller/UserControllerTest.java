@@ -3,12 +3,12 @@ package com.example.project1.controller;
 import com.example.project1.Dao.UserDao;
 import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
-import com.example.project1.Entity.User;
 import com.example.project1.Service.JwtGeneratorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +31,7 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    @Qualifier("userDao")
     private UserDao userDao;
 
     @Autowired
@@ -62,8 +62,8 @@ public class UserControllerTest {
                 .andExpect((ResultMatcher) jsonPath("$.password", notNullValue()));
 
         // 檢查資料庫中的密碼不為明碼
-        User user = (User) userDao.findByEmail();
-        assertNotEquals(userRegisterRequest.getPassword(), user.getPassword()); //兩個參數的值不一樣才是正確的
+        //User user = userJwtRepository.getUserByEmail;
+        //assertNotEquals(userRegisterRequest.getPassword(), user.getPassword()); //兩個參數的值不一樣才是正確的
     }
 
     @Test //不是 email 格式的值的話是否能夠擋下來

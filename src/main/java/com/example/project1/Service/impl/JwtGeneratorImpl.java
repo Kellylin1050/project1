@@ -1,11 +1,13 @@
 package com.example.project1.Service.impl;
 
-import com.example.project1.Dao.UserJwtRepository;
+
+import com.example.project1.Dao.UserDao;
 import com.example.project1.Entity.User;
 import com.example.project1.Service.JwtGeneratorService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,8 @@ import java.util.Map;
 public class JwtGeneratorImpl implements JwtGeneratorService {
 
     @Autowired
-    private UserJwtRepository userJwtRepository;
+    @Qualifier("userDao")
+    private UserDao userDao;
 
     @Value("${jwt.secret}")
     private String secret;
