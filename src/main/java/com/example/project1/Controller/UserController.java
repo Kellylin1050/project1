@@ -1,8 +1,10 @@
 package com.example.project1.Controller;
 
+import com.example.project1.Dto.UserRegisterRequest;
 import com.example.project1.Entity.User;
 import com.example.project1.Service.JwtGeneratorService;
 import com.example.project1.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
     private UserService userService;
     private JwtGeneratorService jwtGeneratorService;
@@ -26,7 +29,17 @@ public class UserController {
         userService.findUser();
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
+
     @PostMapping("/register")
+    public ResponseEntity<User> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest){
+        Integer userId = userService.register(userRegisterRequest);
+
+        User user = userService.findById(userId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+
+    }
+    /*@PostMapping("/register")
     public ResponseEntity<?> postUser(@RequestBody User user){
         try{
             userService.saveUser(user);
@@ -34,7 +47,7 @@ public class UserController {
         } catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
-    }
+    }*/
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody User user) {

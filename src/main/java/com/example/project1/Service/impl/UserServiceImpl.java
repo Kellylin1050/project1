@@ -2,9 +2,12 @@ package com.example.project1.Service.impl;
 
 import com.example.project1.Dao.UserDao;
 import com.example.project1.Dao.UserJwtRepository;
+import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
 import com.example.project1.Entity.User;
 import com.example.project1.Service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,14 +23,16 @@ import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private static UserDao userDao;
-
+    @Autowired
     private UserJwtRepository userJwtRepository;
 
     @Autowired
-    public UserServiceImpl(UserJwtRepository userJwtRepository){
-        this.userJwtRepository=userJwtRepository;
+    public UserServiceImpl(UserJwtRepository userJwtRepository) {
+        this.userJwtRepository = userJwtRepository;
     }
 
 
@@ -48,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Integer deleteById(Integer id) {
-        int row=userDao.deleteById(id);
+        int row = userDao.deleteById(id);
         return row;
     }
 
@@ -62,7 +67,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByNameAndPassword(String name, String password) throws UsernameNotFoundException {
         User user = UserJwtRepository.findByUserNameAndPassword(name, password);
-        if(user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("Invalid id and password");
         }
         return user;
@@ -75,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByEmail(String email) {
-        List<User> userList = (List<User>) userDao.findByEmail();
+        List<User> userList = (List<User>) userDao.getUserByEmail(email);
         return userList;
     }
 
@@ -86,9 +91,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int register(UserRegisterRequest userRegisterRequest) {
-        User user = (User) findByEmail(userRegisterRequest.getEmail());
+    public Integer register(UserRegisterRequest userRegisterRequest) {
+        // 檢查註冊的 email
+        User user = userDao.getUserByEmail(userRegisterRequest.getEmail());
+
         if (user != null) {
+            logger.info("該 email {} 已經被註冊", userRegisterRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
@@ -99,6 +107,27 @@ public class UserServiceImpl implements UserService {
         //創建帳號
         return userDao.CreateUser(userRegisterRequest);
     }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+
+        // 檢查 user 是否存在
+        if (user == null) {
+            logger.info("該 email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        // 使用 MD5 生成密碼的雜湊值
+        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+
+        // 比較密碼
+        if (user.getPassword().equals(hashedPassword)) {
+            return user;
+        } else {
+            logger.info("email {} 的密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
     /*@Autowired
     private UserDao.UserRepository userRepository;
@@ -114,4 +143,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }*/
 
+    }
 }
+

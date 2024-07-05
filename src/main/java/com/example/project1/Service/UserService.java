@@ -1,5 +1,6 @@
 package com.example.project1.Service;
 
+import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
 import com.example.project1.Entity.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +22,8 @@ public interface UserService  {
 
     List<User> findByEmail(String email);
     User resetPassword(String password);
+    User login(UserLoginRequest userLoginRequest);
 
-    int register(UserRegisterRequest userRegisterRequest);
+    Integer register(UserRegisterRequest userRegisterRequest);
 
 }

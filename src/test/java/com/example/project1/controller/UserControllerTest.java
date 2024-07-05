@@ -1,14 +1,18 @@
 package com.example.project1.controller;
 
 import com.example.project1.Dao.UserDao;
+import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
 import com.example.project1.Entity.User;
+import com.example.project1.Service.JwtGeneratorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -21,7 +25,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@RunWith(SpringJUnit4ClassRunner.class)
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -29,7 +34,12 @@ public class UserControllerTest {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private JwtGeneratorService jwtGeneratorService;
+
     private ObjectMapper objectMapper = new ObjectMapper();
+
+
 
     // 註冊新帳號
     @Test //是否能夠去註冊一個新帳號
@@ -41,7 +51,7 @@ public class UserControllerTest {
         String json = objectMapper.writeValueAsString(userRegisterRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/register")
+                .post("/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
 
@@ -95,7 +105,18 @@ public class UserControllerTest {
                 .andExpect(status().is(400));
     }
 
-   /* // 登入
+    /*@Test
+    public void testGetUserA() throws Exception {
+        ResultActions negativeCase = mockMvc.perform(userDao.findUser("/users/user")
+                .contentType(MediaType.APPLICATION_JSON));
+        negativeCase.andExpect(status().isBadRequest())
+                .andExpect(result -> Assertions.assertTrue(
+                        result.getResolvedException() instanceof MethodArgumentTypeMismatchException));
+    }*/
+
+
+
+   // 登入
     @Test //是否能夠成功的去登入
     public void login_success() throws Exception {
         // 先註冊新帳號
@@ -119,10 +140,10 @@ public class UserControllerTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(200))
-                .andExpect(jsonPath("$.userId", notNullValue()))
-                .andExpect(jsonPath("$.email", equalTo(userRegisterRequest.getEmail())))
-                .andExpect(jsonPath("$.createdDate", notNullValue()))
-                .andExpect(jsonPath("$.lastModifiedDate", notNullValue()));
+                .andExpect((ResultMatcher) jsonPath("$.userId", notNullValue()))
+                .andExpect((ResultMatcher) jsonPath("$.email", equalTo(userRegisterRequest.getEmail())))
+                .andExpect((ResultMatcher) jsonPath("$.createdDate", notNullValue()))
+                .andExpect((ResultMatcher) jsonPath("$.lastModifiedDate", notNullValue()));
     }
 
     @Test //使用者的密碼輸入錯誤是否能夠擋下來
@@ -196,6 +217,6 @@ public class UserControllerTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(201));
-    }*/
+    }
 
 }

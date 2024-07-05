@@ -28,6 +28,7 @@ public class JwtGeneratorImpl implements JwtGeneratorService {
     @Value("${jwt.secret}")
     private String message;
 
+
     @Override
     public Map<String, String> generateToken(User user) {
         String jwtToken="";

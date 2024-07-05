@@ -7,45 +7,33 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
+public interface UserDao {
 
-public class UserDao {
     @Insert("insert into user(email,user_name,password,enabled) values(#{email},#{user_name},#{password},#{phone},#{enabled})")
-    public int insertUser(User entity){
-        return 0;
-    }
+    int insertUser(User user);
 
     @Insert("insert into user(email,name,password,enabled) values(#{email},#{name},#{password},#{enabled})")
-    public int CreateUser(UserRegisterRequest entity){
-        return 0;
-    }
+    int CreateUser(UserRegisterRequest userRegisterRequest);
+
     @Update("update user set Email=#{email},#{user_name},#{password},#{phone},#{enabled} where id=#{id}")
-    public Integer updateUser(User entity) {
-        return null;
-    }
+    Integer updateUser(User entity);
 
     @Select("select * from user where id=#{id}")
-    public User findById(Integer id) {
-        return null;
-    }
+    User findById(Integer id);
 
     @Delete("delete from user where id=#{id}")
-    public int deleteById(Integer id) {
-        return 0;
-    }
+    int deleteById(Integer id);
 
     @Select("select * from user")
-    public List<User> findUser() {
-        return null;
-    }
+    List<User> findUser();
 
     @Select("select * from user where Email=#{email}")
-    public User findByEmail(){
-        return null;
-    }
+    User getUserByEmail(String email);
+
+    @Select("select * from user where Email=#{email}")
+    User findByEmail();
 
     @Update("update user set #{password} where id=#{id}")
-    public User resetPassword(){
-        return null;
-    }
+    User resetPassword();
 
 }

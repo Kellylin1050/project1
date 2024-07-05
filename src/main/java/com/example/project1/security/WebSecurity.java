@@ -46,16 +46,21 @@ public class WebSecurity {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(Csrf -> Csrf.disable())
                 .authorizeHttpRequests(
-                        requests -> requests
+                        auth -> auth
                                 .requestMatchers("/register").permitAll()
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/swagger-ui.html").permitAll()
                                 .requestMatchers("/swagger-resources/**").permitAll()
-                                .requestMatchers("/v2-api-docs").permitAll()
+                                .requestMatchers("/v2/api-docs/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .requestMatchers("/v2/api-docs").permitAll()
+                                .requestMatchers("/v3/api-docs").permitAll()
                                 .requestMatchers("/webjars/**").permitAll()
                                 .requestMatchers("/csrf").permitAll()
-                                .requestMatchers("/user").permitAll()
+                                .requestMatchers("/users/**").permitAll()
                                 //.requestMatchers("/doUpdateNewbook").hasRole("ADMIN")
                                 //.requestMatchers("/users/**").hasRole("USER")
                                 .anyRequest()
@@ -63,6 +68,7 @@ public class WebSecurity {
                 )
                 .formLogin(withDefaults())
                 .logout(withDefaults());
+
 
         return http.build();
     }
