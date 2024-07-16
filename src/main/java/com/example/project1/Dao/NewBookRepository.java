@@ -1,15 +1,21 @@
 package com.example.project1.Dao;
 
 import com.example.project1.Entity.NewBook;
-import org.apache.ibatis.annotations.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
-@Mapper
 @Repository
-public class NewBookDao {
+public interface NewBookRepository extends JpaRepository<NewBook,Integer> {
 
+    Optional<NewBook> findById(Integer id);
+
+    void deleteById(Integer id);
+
+    NewBook findNewBookByTitle(String title);
+
+/*
     @Update("update new_book set Title=#{title},=#{description} =#{price} =#{sellprice} where id=#{id}")
     public Integer updateNewBook(NewBook entity) {
         return null;
@@ -34,7 +40,7 @@ public class NewBookDao {
     @Select("select * from new_book")
     public List<NewBook> findNewBook() {
         return null;
-    }
-
+      }
+*/
 
 }

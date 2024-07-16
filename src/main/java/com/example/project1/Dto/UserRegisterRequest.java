@@ -8,7 +8,7 @@ public class UserRegisterRequest {
     private String name;
 
     @NotBlank
-    @Email
+    @Email(message = "Email should be valid")
     private String email;
 
     @NotBlank

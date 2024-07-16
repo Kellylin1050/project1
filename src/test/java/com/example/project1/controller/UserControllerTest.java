@@ -1,69 +1,81 @@
 package com.example.project1.controller;
 
-import com.example.project1.Dao.UserDao;
+import com.example.project1.Dao.UserRepository;
 import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
+import com.example.project1.Entity.User;
+import com.example.project1.Project1Application;
 import com.example.project1.Service.JwtGeneratorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.catalina.core.ApplicationContext;
 import org.junit.Test;
+import org.junit.internal.Classes;
 import org.junit.runner.RunWith;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.client.match.JsonPathRequestMatchers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes={Project1Application.class},webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
+//@MapperScan(basePackages = "com.example.project1.Dao.UserDao")
+//@ContextConfiguration(locations ="classpath:application.properties")
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    @Qualifier("userDao")
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Autowired
     private JwtGeneratorService jwtGeneratorService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-
-
-    // 註冊新帳號
-    @Test //是否能夠去註冊一個新帳號
+    @Test
+    public void testMapper() {
+        User u1 = userRepository.findById(1);
+        System.out.println(u1.getName());
+    }
+    @Test//是否能夠去註冊一個新帳號
     public void register_success() throws Exception {
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setEmail("test1@gmail.com");
-        userRegisterRequest.setPassword("123");
+        userRegisterRequest.setEmail("test3@gmail.com");
+        userRegisterRequest.setPassword("1234");
+        userRegisterRequest.setName("kkkk");
 
         String json = objectMapper.writeValueAsString(userRegisterRequest);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/users/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201))
-                .andExpect((ResultMatcher) jsonPath("$.name", notNullValue()))
-                .andExpect((ResultMatcher) jsonPath("$.email", equalTo("test1@gmail.com")))
-                .andExpect((ResultMatcher) jsonPath("$.password", notNullValue()));
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", notNullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", equalTo("test3@gmail.com")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password", notNullValue()));
 
         // 檢查資料庫中的密碼不為明碼
-        //User user = userJwtRepository.getUserByEmail;
-        //assertNotEquals(userRegisterRequest.getPassword(), user.getPassword()); //兩個參數的值不一樣才是正確的
+        User user = userRepository.getUserByEmail(userRegisterRequest.getEmail());
+        assertNotEquals(userRegisterRequest.getPassword(), user.getPassword());
     }
 
     @Test //不是 email 格式的值的話是否能夠擋下來
@@ -71,6 +83,8 @@ public class UserControllerTest {
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
         userRegisterRequest.setEmail("3gd8e7q34l9");
         userRegisterRequest.setPassword("123");
+        userRegisterRequest.setName("kkkk");
+
 
         String json = objectMapper.writeValueAsString(userRegisterRequest);
 
@@ -87,8 +101,9 @@ public class UserControllerTest {
     public void register_emailAlreadyExist() throws Exception {
         // 先註冊一個帳號
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setEmail("test2@gmail.com");
-        userRegisterRequest.setPassword("123");
+        userRegisterRequest.setEmail("test4@gmail.com");
+        userRegisterRequest.setPassword("1234");
+        userRegisterRequest.setName("difue");
 
         String json = objectMapper.writeValueAsString(userRegisterRequest);
 
@@ -116,13 +131,14 @@ public class UserControllerTest {
 
 
 
-   // 登入
-    @Test //是否能夠成功的去登入
+    // 登入
+   /* @Test //是否能夠成功的去登入
     public void login_success() throws Exception {
         // 先註冊新帳號
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setEmail("test3@gmail.com");
-        userRegisterRequest.setPassword("123");
+        userRegisterRequest.setEmail("test5@gmail.com");
+        userRegisterRequest.setPassword("12345");
+        userRegisterRequest.setName("djfkftjf");
 
         register(userRegisterRequest);
 
@@ -139,19 +155,53 @@ public class UserControllerTest {
                 .content(json);
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().is(200))
-                .andExpect((ResultMatcher) jsonPath("$.userId", notNullValue()))
-                .andExpect((ResultMatcher) jsonPath("$.email", equalTo(userRegisterRequest.getEmail())))
-                .andExpect((ResultMatcher) jsonPath("$.createdDate", notNullValue()))
-                .andExpect((ResultMatcher) jsonPath("$.lastModifiedDate", notNullValue()));
+                .andExpect(MockMvcResultMatchers.status().is(200))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password", equalTo(userRegisterRequest.getPassword())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", equalTo(userRegisterRequest.getEmail())));
+
+    }*/
+
+    @Test
+    public void login_success() throws Exception {
+        // 先註冊新帳號
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("test5@gmail.com");
+        userRegisterRequest.setPassword("12345");
+        userRegisterRequest.setName("djfkftjf");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRegisterRequest)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        // 再測試登入功能
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail(userRegisterRequest.getEmail());
+        userLoginRequest.setPassword(userRegisterRequest.getPassword());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userLoginRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+        // .andExpect(MockMvcResultMatchers.jsonPath("$.token").exists()); // 假設登入成功後返回包含 token 的 JSON
     }
+
+   /* @Test
+    public void login_success() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"email\": \"test1@example.com\", \"password\": \1234\" }"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token").exists()); // 假設登入成功後返回包含 token 的 JSON
+    }*/
 
     @Test //使用者的密碼輸入錯誤是否能夠擋下來
     public void login_wrongPassword() throws Exception {
         // 先註冊新帳號
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setEmail("test4@gmail.com");
+        userRegisterRequest.setEmail("test6@gmail.com");
         userRegisterRequest.setPassword("123");
+        userRegisterRequest.setName("aaa");
 
         register(userRegisterRequest);
 

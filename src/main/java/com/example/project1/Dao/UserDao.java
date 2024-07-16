@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.Optional;
 
-@Mapper
+/*@Mapper
 public interface UserDao  {
     //@Insert("insert into user(email,user_name,password,enabled) values(#{email},#{user_name},#{password},#{phone},#{enabled})")
     //int insertUser(User user);
@@ -37,4 +37,4 @@ public interface UserDao  {
 
     //@Select("select * from user where user_name=#{username}")
     //String findByUsername(String username);
-}
+}*/

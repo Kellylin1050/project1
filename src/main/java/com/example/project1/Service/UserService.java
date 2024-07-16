@@ -6,44 +6,20 @@ import com.example.project1.Entity.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 public interface UserService  {
-    Integer updateUser(User Entity);
-    Optional<User> findById(Long id);
-    Integer saveUser(User Entity);
-    Integer deleteById(Integer id);
-
-    public User getUserByNameAndPassword(String name, String password) throws UsernameNotFoundException;
-
-    Map<String, String> generateToken(User user);
-
-    List<User> findByEmail(String email);
-    User resetPassword(String password);
-
+    User updateUser(User Entity);
+    Optional<User> findById(Integer id);
+    User insertUser(User Entity);
+    String deleteById(Integer id);
+    User findUser(String name);
+    User getUserByNameAndPassword(String name, String password) throws UsernameNotFoundException;
+    User resetPassword(User password);
+    User register(UserRegisterRequest userRegisterRequest);
     User login(UserLoginRequest userLoginRequest);
+    //List<User> findByEmail(String email);
+    //Map<String, String> generateToken(User user);
 
-    Integer register(UserRegisterRequest userRegisterRequest);
-
-    String findByUsername(String name);
 }
-    /*
-        Integer updateUser(User entity);
-        User findById(Long id);
-        Integer saveUser(User entity);
-
-        Long deleteById(Long id);
-
-        User getUserByNameAndPassword(String name, String password) throws UsernameNotFoundException;
-        Map<String, String> generateToken(User user);
-        List<User> findByEmail(String email);
-        User resetPassword(String email);
-        User login(UserLoginRequest userLoginRequest);
-        Integer register(UserRegisterRequest userRegisterRequest);
-
-
-        String findByUsername(String username);/*
-}*/

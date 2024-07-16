@@ -1,8 +1,8 @@
 package com.example.project1.Service.impl;
 
 import com.example.project1.Dao.MyUserDetails;
+import com.example.project1.Dao.UserRepository;
 import com.example.project1.Entity.User;
-import com.example.project1.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
