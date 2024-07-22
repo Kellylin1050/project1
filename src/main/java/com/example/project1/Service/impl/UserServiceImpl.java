@@ -5,11 +5,13 @@ import com.example.project1.Dao.UserRepository;
 import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
 import com.example.project1.Entity.User;
+import com.example.project1.Service.JwtGeneratorService;
 import com.example.project1.Service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -26,6 +28,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private UserJwtRepository userJwtRepository;
+
+    @Autowired
+    private JwtGeneratorService jwtGeneratorService;
 
     @Autowired
     public UserServiceImpl(UserJwtRepository userJwtRepository,UserRepository userRepository) {
@@ -114,9 +119,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(UserLoginRequest userLoginRequest) {
         User user = userRepository.getUserByEmail(userLoginRequest.getEmail());
+        return user;
 
         // 檢查 user 是否存在
-        if (user == null) {
+        /*if (user == null) {
             logger.info("該 email {} 尚未註冊", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -130,8 +136,8 @@ public class UserServiceImpl implements UserService {
         } else {
             logger.info("email {} 的密碼不正確", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
+        }*/
+    }
     /*@Autowired
     private UserDao.UserRepository userRepository;
 
@@ -146,6 +152,7 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }*/
 
-    }
+
 }
+
 

@@ -5,24 +5,32 @@ import com.example.project1.Dto.UserRegisterRequest;
 import com.example.project1.Entity.User;
 import com.example.project1.Service.JwtGeneratorService;
 import com.example.project1.Service.UserService;
+import com.example.project1.Service.impl.TokenBlacklistService;
+import com.example.project1.Service.impl.UserServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.ui.Model;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private UserService userService;
     private UserDetailsService userDetailsService;
     private JwtGeneratorService jwtGeneratorService;
-
+    private TokenBlacklistService tokenBlacklistService;
     @Autowired
     public UserController(UserService userService, JwtGeneratorService jwtGeneratorService){
         this.userService=userService;
@@ -66,17 +74,39 @@ public class UserController {
 
     @PostMapping("/login") //登入
     public ResponseEntity<?> loginUser(@RequestBody UserLoginRequest userLoginRequest) {
+        User user = userService.login(userLoginRequest);
+        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+        if (user.getPassword().equals(hashedPassword)) {
+            return new ResponseEntity<>(jwtGeneratorService.generateToken(userLoginRequest), HttpStatus.OK);
+        } else {
+            logger.info("email {} 的密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        /*return ResponseEntity.status(HttpStatus.OK).body(user);
         try {
-            if(userLoginRequest.getEmail() == null || userLoginRequest.getPassword() == null) {
+            if(user.getEmail() == null || user.getPassword() == null) {
                 throw new UsernameNotFoundException("Email or Password is Empty");
             }
-            User userData = userService.getUserByNameAndPassword(userLoginRequest.getEmail(), userLoginRequest.getPassword());
+            User userData = userService.getUserByNameAndPassword(user.getEmail(), user.getPassword());
             if(userData == null){
                 throw new UsernameNotFoundException("UserName or Password is Invalid");
             }
             return new ResponseEntity<>(jwtGeneratorService.generateToken(userLoginRequest), HttpStatus.OK);
         } catch (UsernameNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }*/
+    }
+
+
+    @PostMapping("/logout")//登出
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String token = jwtGeneratorService.resolveToken(request);
+
+        if (token != null && jwtGeneratorService.validateToken(token)) {
+            tokenBlacklistService.addTokenToBlacklist(token); // 将令牌添加到黑名单
+            return ResponseEntity.ok("Successfully logged out");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
         }
     }
     /*@PostMapping("/login")
@@ -86,13 +116,14 @@ public class UserController {
     }*/
 
 
-    @PostMapping("/updateUser") //新增
+
+    @PostMapping("/updateUser")
     public ResponseEntity<User> doUpdateUser(User entity){
         userService.updateUser(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+        return ResponseEntity.status(HttpStatus.OK).body(entity);
     }
 
-    @RequestMapping("/editUser/{id}")  //改
+    @GetMapping("/doFindById/{id}")
     public ResponseEntity<Object> dofindById(@PathVariable Integer id ,Model model){
         Optional<User> user = userService.findById(id);
         //if (user == null){
@@ -128,16 +159,16 @@ public class UserController {
          return "delete";
      }*/
     @DeleteMapping("/deleteUser/{id}")  //刪除
-    public ResponseEntity<Void> dodeleteById(@PathVariable Integer id) {
+    public ResponseEntity<String> dodeleteById(@PathVariable Integer id) {
         Integer deleteCount = Integer.valueOf(userService.deleteById(id));
         if (deleteCount == 0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).body("delete");
     }
     @PostMapping("/forgetpassword") //忘記密碼
-    public ResponseEntity<String> doresetPassword(@RequestParam User newPassword) {
-        User updateCount = userService.resetPassword(newPassword);
+    public ResponseEntity<String> doresetPassword(@RequestParam User Password) {
+        User updateCount = userService.resetPassword(Password);
         if (updateCount == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }

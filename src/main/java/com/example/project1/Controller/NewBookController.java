@@ -19,7 +19,7 @@ public class NewBookController {
     @GetMapping("/book")
     public ResponseEntity<String> findNewBook(String newBook){
         newBookService.findNewBook(newBook);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newBook);
+        return ResponseEntity.status(HttpStatus.OK).body(newBook);
     }
 
     @PostMapping("/doUpdateNewBook")
@@ -28,23 +28,23 @@ public class NewBookController {
         return ResponseEntity.status(HttpStatus.OK).body(entity);
     }
 
-    @RequestMapping("/edit/{id}")
+    @GetMapping("/doFindById/{id}")
     public String doFindById(@PathVariable Integer id, Model model){
         Optional<NewBook> newBook = newBookService.findById(id);
         model.addAttribute("n", newBook);
         return "newBook_update";
     }
 
-    @RequestMapping("/doSaveNewBook")
+    @PostMapping("/doSaveNewBook")
     public ResponseEntity<NewBook> doSaveNewBook (NewBook entity) {
         newBookService.saveNewBook(entity);
         return ResponseEntity.status(HttpStatus.OK).body(entity);
     }
 
-    @RequestMapping("/delete/{id}")
-    public String doDeleteById (@PathVariable Integer id) {
+    @DeleteMapping ("/delete/{id}")
+    public ResponseEntity<String> doDeleteById (@PathVariable Integer id) {
         newBookService.deleteById(id);
-        return "delete";
+        return ResponseEntity.status(HttpStatus.OK).body("delete");
     }
 
    /* @RequestMapping("/new")

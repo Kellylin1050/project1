@@ -140,6 +140,8 @@ public class WebSecurity{
                                 .requestMatchers("/webjars/**").permitAll()
                                 .requestMatchers("/csrf").permitAll()
                                 .requestMatchers("/users/**").permitAll()
+                                .requestMatchers("/NewBook/**").permitAll()
+                                .requestMatchers("/webjars/**").permitAll()
                                 //.requestMatchers("/doUpdateNewbook").hasRole("ADMIN")
                                 //.requestMatchers("/users/**").hasRole("USER")
                                 .anyRequest()
