@@ -1,6 +1,7 @@
 package com.example.project1.Service.impl;
 
 import com.example.project1.Dao.NewBookRepository;
+import com.example.project1.Dto.NewBookRequest;
 import com.example.project1.Entity.NewBook;
 import com.example.project1.Service.NewBookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,13 @@ public class NewBookServiceImpl implements NewBookService {
     @Autowired
     private NewBookRepository newBookRepository;
     @Override
-    public NewBook updateNewBook(NewBook entity) {
-        return newBookRepository.save(entity);
+    public int updateNewBook(NewBookRequest newBookRequest) {
+       return newBookRepository.updateNewBook(newBookRequest.getId(),newBookRequest.getTitle(),newBookRequest.getAuthor(),newBookRequest.getDescription(),newBookRequest.getPrice(),newBookRequest.getSellprice());
     }
-    @Override
+    /*@Override
     public Optional<NewBook> findById(Integer id) {
         return newBookRepository.findById (id);
-    }
+    }*/
     @Override
     public NewBook saveNewBook(NewBook entity) {
         return newBookRepository.save(entity);
@@ -32,8 +33,15 @@ public class NewBookServiceImpl implements NewBookService {
         return "delete";
     }
     @Override
-    public List<NewBook> findNewBook(String title) {
-        List<NewBook> newBookList= (List<NewBook>) newBookRepository.findNewBookByTitle(title);
-        return newBookList;
+    public NewBook getNewBookByTitle(String title) {
+        return newBookRepository.getNewBookByTitle(title);
+
     }
+
+
+
+    /*@Override
+    public NewBook getNewBookById(Integer id) {
+        return newBookRepository.getNewBookById(id);
+    }*/
 }

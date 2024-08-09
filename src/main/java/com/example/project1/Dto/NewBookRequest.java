@@ -1,29 +1,23 @@
-package com.example.project1.Entity;
+package com.example.project1.Dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
-@Schema(description = "書籍實體")
-@Entity
-@Table(name="book")
-public class NewBook {
-    @Schema(description = "書名", example = "Slow Dance")
+
+@Schema(description = "新書上傳要求")
+public class NewBookRequest {
+    @Schema(description = "書名", example = "Java Programming")
     private String title;
-    @Schema(description = "作者", example = "Rainbow Rowell")
+    @Schema(description = "作者", example = "John Doe")
     private String author;
-    @Schema(description = "書籍描述", example = "Shiloh questions if Kerry still wants to reconnect after all the time and changes.")
+    @Schema(description = "書籍描述", example = "一本關於java的指南")
     private String description;
-    @Schema(description = "價格", example = "600")
+    @Schema(description = "價格", example = "500")
     private Integer price;
-    @Schema(description = "銷售價格", example = "550")
+    @Schema(description = "銷售價格", example = "520")
     private Integer sellprice;
     @Schema(description = "書籍id", example = "1")
-    @Id
-    @Column(name = "book_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     // Getters and Setters
-
     public String getTitle() {
         return title;
     }
@@ -63,12 +57,7 @@ public class NewBook {
     public void setSellprice(Integer sellprice) {
         this.sellprice = sellprice;
     }
-
-    public Integer getId() {
-        return id;
+    public Integer getId(){return id;
     }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
+    public void setId(Integer id){this.id = id;}
 }

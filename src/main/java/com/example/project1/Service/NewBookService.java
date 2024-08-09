@@ -1,5 +1,6 @@
 package com.example.project1.Service;
 
+import com.example.project1.Dto.NewBookRequest;
 import com.example.project1.Entity.NewBook;
 import org.springframework.stereotype.Service;
 
@@ -8,9 +9,10 @@ import java.util.Optional;
 
 @Service
 public interface NewBookService {
-    NewBook updateNewBook(NewBook entity);
-    Optional<NewBook> findById(Integer id);
+    int updateNewBook(NewBookRequest newBookRequest);
+    //NewBook getNewBookById(Integer id);
     NewBook saveNewBook(NewBook entity);
     String deleteById(Integer id);
-    List<NewBook> findNewBook(String title);
+    NewBook getNewBookByTitle(String title);
+    //NewBook getNewBookById(Integer id);
 }

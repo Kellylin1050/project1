@@ -3,36 +3,34 @@ package com.example.project1.controller;
 import com.example.project1.Dao.UserRepository;
 import com.example.project1.Dto.UserLoginRequest;
 import com.example.project1.Dto.UserRegisterRequest;
+import com.example.project1.Dto.UserResetPasswordRequest;
+import com.example.project1.Dto.UserUpdateRequest;
 import com.example.project1.Entity.User;
 import com.example.project1.Project1Application;
-import com.example.project1.Service.JwtGeneratorService;
 import com.example.project1.Service.UserService;
 import com.example.project1.Service.impl.TokenBlacklistService;
+import com.example.project1.security.AuthResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.catalina.core.ApplicationContext;
+import org.hibernate.validator.internal.util.Contracts;
 import org.junit.Test;
-import org.junit.internal.Classes;
 import org.junit.runner.RunWith;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.http.MediaType;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.client.match.JsonPathRequestMatchers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.hibernate.validator.internal.util.Contracts.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,25 +50,41 @@ public class UserControllerTest {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtGeneratorService jwtGeneratorService;
+    //@Autowired
+    //private JwtGeneratorService jwtGeneratorService;
 
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Test
-    public void testMapper() {
-        User u1 = userRepository.findById(1);
-        System.out.println(u1.getName());
+    @Test//是否能夠去查詢一個新帳號
+    public void getUser_success() throws Exception{
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("john.doe@example.com");
+        userRegisterRequest.setPassword("1234567");
+        userRegisterRequest.setName("john");
+        userRegisterRequest.setUsername("john");
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRegisterRequest)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/users/user")
+                        .param("username", "john"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(userRegisterRequest.getUsername()));
     }
     @Test//是否能夠去註冊一個新帳號
     public void register_success() throws Exception {
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setEmail("test3@gmail.com");
-        userRegisterRequest.setPassword("1234");
-        userRegisterRequest.setName("kkkk");
+        userRegisterRequest.setEmail("test50@gmail.com");
+        userRegisterRequest.setPassword("12345");
+        userRegisterRequest.setName("qqq");
+        userRegisterRequest.setUsername("qqq");
 
         String json = objectMapper.writeValueAsString(userRegisterRequest);
 
@@ -78,8 +92,9 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", notNullValue()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", equalTo("test3@gmail.com")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name",notNullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", notNullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", equalTo("test50@gmail.com")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password", notNullValue()));
 
         // 檢查資料庫中的密碼不為明碼
@@ -93,6 +108,7 @@ public class UserControllerTest {
         userRegisterRequest.setEmail("3gd8e7q34l9");
         userRegisterRequest.setPassword("123");
         userRegisterRequest.setName("kkkk");
+        userRegisterRequest.setUsername("kkkk");
 
 
         String json = objectMapper.writeValueAsString(userRegisterRequest);
@@ -113,6 +129,7 @@ public class UserControllerTest {
         userRegisterRequest.setEmail("save@gmail.com");
         userRegisterRequest.setPassword("245857");
         userRegisterRequest.setName("owief");
+        userRegisterRequest.setUsername("owief");
 
         String json = objectMapper.writeValueAsString(userRegisterRequest);
 
@@ -177,6 +194,7 @@ public class UserControllerTest {
         userRegisterRequest.setEmail("test12@gmail.com");
         userRegisterRequest.setPassword("12345");
         userRegisterRequest.setName("mmm");
+        userRegisterRequest.setUsername("mmm");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -185,14 +203,14 @@ public class UserControllerTest {
 
         // 再測試登入功能
         UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setEmail(userRegisterRequest.getEmail());
+        userLoginRequest.setUsername(userRegisterRequest.getUsername());
         userLoginRequest.setPassword(userRegisterRequest.getPassword());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userLoginRequest)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-                //.andExpect(MockMvcResultMatchers.jsonPath("$.token").exists()); // 假設登入成功後返回包含 token 的 JSON
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.token").exists()); // 假設登入成功後返回包含 token 的 JSON
     }
 
    /* @Test
@@ -211,12 +229,13 @@ public class UserControllerTest {
         userRegisterRequest.setEmail("test10@gmail.com");
         userRegisterRequest.setPassword("1234");
         userRegisterRequest.setName("aaatgs");
+        userRegisterRequest.setUsername("aaatgs");
 
         register(userRegisterRequest);
 
         // 測試密碼輸入錯誤的情況
         UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setEmail(userRegisterRequest.getEmail());
+        userLoginRequest.setUsername(userRegisterRequest.getUsername());
         userLoginRequest.setPassword("unknown");
 
         String json = objectMapper.writeValueAsString(userLoginRequest);
@@ -233,7 +252,7 @@ public class UserControllerTest {
     @Test //email 格式輸入不正確的情況是否能夠擋下來
     public void login_invalidEmailFormat() throws Exception {
         UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setEmail("hkbudsr324");
+        userLoginRequest.setUsername("hkbudsr324");
         userLoginRequest.setPassword("123");
 
         String json = objectMapper.writeValueAsString(userLoginRequest);
@@ -250,7 +269,7 @@ public class UserControllerTest {
     @Test //輸入了一個從來沒有註冊過的帳號是否可以擋下來
     public void login_emailNotExist() throws Exception {
         UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setEmail("unknown@gmail.com");
+        userLoginRequest.setUsername("unknown@");
         userLoginRequest.setPassword("123");
 
         String json = objectMapper.writeValueAsString(userLoginRequest);
@@ -263,12 +282,35 @@ public class UserControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(400));
     }
-
+    /*
     @Test
     public void testLogout() throws Exception{
-        String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MTJAZ21haWwuY29tIiwiaWF0IjoxNzIxNjM5OTkwfQ.qzTW25waS67KL22p9atpFQJsU7a2viZzRD32k0MMCg4";
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("test30@gmail.com");
+        userRegisterRequest.setPassword("12345");
+        userRegisterRequest.setName("jjj");
+        userRegisterRequest.setUsername("jjj");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRegisterRequest)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        // 再測試登入功能
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail(userRegisterRequest.getEmail());
+        userLoginRequest.setPassword(userRegisterRequest.getPassword());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userLoginRequest)))
+                        .andExpect(MockMvcResultMatchers.status().isOk())
+                        .andReturn();
+        String response = result.getResponse().getContentAsString();
+        AuthResponse authResponse =objectMapper.readValue(response,AuthResponse.class);
+        String token = authResponse.getToken();
         //jwtGeneratorService.validateToken(token);
-        //tokenBlacklistService.addTokenToBlacklist(token);
+        tokenBlacklistService.addTokenToBlacklist(token);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/logout")
                 .header("Authorization","Bearer" + token)
@@ -277,18 +319,124 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Successful logged out"));
 
+    }*/
+    //@WithMockUser(username = "user", roles = {"USER"})
+    @Test
+    public void testLogout() throws Exception {
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("test40@gmail.com");
+        userRegisterRequest.setPassword("12345678");
+        userRegisterRequest.setName("xxx");
+        userRegisterRequest.setUsername("xxx");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRegisterRequest)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        // 登錄用戶
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setUsername(userRegisterRequest.getUsername());
+        //userLoginRequest.setUsername("xxx");
+        userLoginRequest.setPassword(userRegisterRequest.getPassword());
+        //userLoginRequest.setPassword("12345678");
+
+        MvcResult loginResult = mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userLoginRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        // 獲取 JWT token
+        String loginResponse = loginResult.getResponse().getContentAsString();
+        AuthResponse authResponse = objectMapper.readValue(loginResponse, AuthResponse.class);
+        String token = authResponse.getToken();
+        assertNotNull(token, "JWT token should not be null");
+
+        // 執行登出請求，並確保登出成功
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/logout")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Successfully logged out"));
+
+        // 確保 JWT token 被加入黑名單
+        //tokenBlacklistService.addTokenToBlacklist(token);
+        assertTrue(tokenBlacklistService.isTokenBlacklisted(token), "Token should be in the blacklist");
+
+        // 驗證登出後的行為
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+        userUpdateRequest.setId(133);
+        userUpdateRequest.setName("fjdig");
+        userUpdateRequest.setPhone("0937485123");
+        userUpdateRequest.setUsername("fjdig");
+
+        String json = objectMapper.writeValueAsString(userUpdateRequest);
+        MockHttpServletRequestBuilder updateRequestBuilder = MockMvcRequestBuilders
+                .post("/users/updateUser")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .header("Authorization", "Bearer " + token);
+
+        mockMvc.perform(updateRequestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isForbidden());
+
+
+       /* // 註冊用戶
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("test40@gmail.com");
+        userRegisterRequest.setPassword("12345678");
+        userRegisterRequest.setName("xxx");
+        userRegisterRequest.setUsername("xxx");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRegisterRequest)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
+        // 登錄用戶
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail(userRegisterRequest.getEmail());
+        userLoginRequest.setPassword(userRegisterRequest.getPassword());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userLoginRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        // 獲取 JWT token
+        String response = result.getResponse().getContentAsString();
+        AuthResponse authResponse = objectMapper.readValue(response, AuthResponse.class);
+        String token = authResponse.getToken();
+
+        // 確保 JWT token 被加入黑名單（登出）
+        tokenBlacklistService.addTokenToBlacklist(token);
+
+        // 執行登出請求
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/logout")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("Successfully logged out"));*/
     }
 
-    @Test //???????
+
+
+
+    @Test
+    @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoUpdateUser() throws Exception{
-        User user = new User();
-        user.setId(32);
-        user.setEmail("test374@gmail.com");
-        user.setName("fjdig");
-        user.setPassword("987654");
-        user.setPhone("0937485123");
-        userService.updateUser(user);
-        String json = objectMapper.writeValueAsString(user);
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
+        userUpdateRequest.setId(198);
+        userUpdateRequest.setName("fjdig");
+        userUpdateRequest.setPhone("0937485123");
+        userUpdateRequest.setUsername("fjdig");
+        //userService.updateUser(userUpdateRequest);
+        String json = objectMapper.writeValueAsString(userUpdateRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/updateUser")
@@ -296,12 +444,10 @@ public class UserControllerTest {
                 .content(json);
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
-               // .andExpect(MockMvcResultMatchers.jsonPath("$.name", notNullValue()))
-               // .andExpect(MockMvcResultMatchers.jsonPath("$.email", notNullValue()))
-               // .andExpect(MockMvcResultMatchers.jsonPath("$.password", notNullValue()));
     }
 
     @Test
+    @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoFindById() throws Exception{
         User user = new User();
         user.setId(1);
@@ -316,13 +462,15 @@ public class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoSaveUser()throws Exception{
         User user = new User();
-        user.setId(2);
-        user.setEmail("save@gmail.com");
-        user.setName("owief");
+        //user.setId(2);
+        user.setEmail("save1234@gmail.com");
+        user.setName("2349808");
+        user.setUsername("dsadasd");
         user.setPassword("245857");
-        userService.insertUser(user);
+        user.setPhone("0947382647");
         String json = objectMapper.writeValueAsString(user);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/doSaveUser")
@@ -332,26 +480,27 @@ public class UserControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isCreated());
     }
-    @Test//?????????
+    @Test
+    @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoDeleteById()throws Exception{
-        userService.deleteById(37);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .delete("/users/deleteUser/{id}",39);
+                .delete("/users/deleteUser/{id}",196);
         mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
-                //.andExpect(content().string("delete"));
+                .andExpect(status().isOk())
+                .andExpect(content().string("delete"));
     }
 
     @Test
     public void testdoResetPassword() throws Exception{
-        User user = new User();
-        user.setId(33);
-        user.setName("difue");
-        user.setEmail("test4@gmail.com");
-        user.setPassword("5j084jf");
-        userService.resetPassword(user);
+        UserResetPasswordRequest userResetPasswordRequest = new UserResetPasswordRequest();
+        userResetPasswordRequest.setId(197);
+        userResetPasswordRequest.setPassword("448r9f693v");
+        userService.resetPassword(userResetPasswordRequest);
+        String json = objectMapper.writeValueAsString(userResetPasswordRequest);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/users/forgetpassword");
+                .post("/users/forgetpassword")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
     }
@@ -361,7 +510,6 @@ public class UserControllerTest {
     //提煉註冊程式
     private void register(UserRegisterRequest userRegisterRequest) throws Exception {
         String json = objectMapper.writeValueAsString(userRegisterRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/register")
                 .contentType(MediaType.APPLICATION_JSON)

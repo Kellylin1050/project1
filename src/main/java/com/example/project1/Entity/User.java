@@ -1,36 +1,46 @@
 package com.example.project1.Entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+@Schema(description = "User實體")
 @Entity
 @Table(name = "user")
 public class User {
+    @Schema(description = "使用者id", example = "1")
     @Id
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(nullable = false, unique = true)
+    @Schema(description = "使用者名稱", example = "William_chou")
+    @Column(nullable = false,unique = true)
     private String username;
-
+    @Schema(description = "密碼", example = "4730jihfuiw")
     @Column(nullable = false)
     private String password;
-
+    @Schema(description = "姓名", example = "William")
     private String name;
+    @Schema(description = "書名", example = "0947382645")
     private String phone;
 
+    @Schema(description = "信箱", example = "William38201@gmail.com")
     private String email;
 
+    private boolean enabled;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Schema(description = "User的角色集合")
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(
-            name = "users_roles",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+    //private Collection<Role> roles;
+
+    // Getters and Setters
 
     public Integer getId() {
         return id;
@@ -79,5 +89,8 @@ public class User {
         this.roles = roles;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
 }
 
