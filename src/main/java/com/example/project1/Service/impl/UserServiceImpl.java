@@ -31,16 +31,12 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
-    //@Autowired
-    //private UserJwtRepository userJwtRepository;
 
     @Autowired
     private JwtGeneratorService jwtGeneratorService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
-        //UserJwtRepository userJwtRepository,
-        //this.userJwtRepository = userJwtRepository;
         this.userRepository =userRepository;
     }
 
@@ -75,15 +71,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByNameAndPassword(String username, String password) throws UsernameNotFoundException {
-        User user = userRepository.findByUsernameAndPassword(username, password);
-        if (user == null) {
-            throw new UsernameNotFoundException("Invalid id and password");
-        }
-        return user;
-    }
-
-    @Override
     public int resetPassword(UserResetPasswordRequest userResetPasswordRequest) {
         String hashedPassword = DigestUtils.md5DigestAsHex(userResetPasswordRequest.getPassword().getBytes());
         userResetPasswordRequest.setPassword(hashedPassword);
@@ -111,6 +98,7 @@ public class UserServiceImpl implements UserService {
         user1.setUsername(userRegisterRequest.getUsername());
         Role userRole = roleRepository.findByName("ROLE_USER");
         user1.setRoles(Collections.singleton(userRole));
+        user1.setEnabled(true);
         return userRepository.save(user1);
     }
 

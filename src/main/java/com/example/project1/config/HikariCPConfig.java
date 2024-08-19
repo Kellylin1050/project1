@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class HikariCPConfig {
     private static final Logger logger = LoggerFactory.getLogger(HikariCPConfig.class);
 
-    private static final long connectionTimeout = 0;
+    private static final long connectionTimeout = 30000;
 
     private static final boolean readOnly = false;
 

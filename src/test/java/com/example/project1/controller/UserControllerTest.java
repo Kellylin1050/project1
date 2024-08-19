@@ -310,7 +310,6 @@ public class UserControllerTest {
         userUpdateRequest.setName("fjdig");
         userUpdateRequest.setPhone("0937485123");
         userUpdateRequest.setUsername("fjdig");
-        //userService.updateUser(userUpdateRequest);
         String json = objectMapper.writeValueAsString(userUpdateRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders

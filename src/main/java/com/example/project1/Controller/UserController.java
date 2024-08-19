@@ -41,12 +41,9 @@ import java.util.*;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private UserService userService;
-    private UserDetailsService userDetailsService;
     private JwtGeneratorService jwtGeneratorService;
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
-    @Autowired
-    private RoleRepository roleRepository;
 
 
     @Autowired
@@ -70,7 +67,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user") //查
-    public ResponseEntity<?> findUser(@RequestParam String username) {
+    public ResponseEntity<?> findUser(
+            @Parameter(description = "查詢使用者名稱", required = true, allowEmptyValue = false)
+            @RequestParam String username) {
         try {
             User user = userService.findUser(username);
             if (user != null) {
@@ -195,7 +194,9 @@ public class UserController {
     )
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/doFindById/{id}")
-    public ResponseEntity<Object> dofindById(@PathVariable Integer id, Model model) {
+    public ResponseEntity<Object> dofindById(
+            @Parameter(description = "要查詢的使用者id")
+            @PathVariable Integer id, Model model) {
         Optional<User> user = userService.findById(id);
         model.addAttribute("u", user);
         Optional<User> updatedUser = userService.findById(id);
@@ -233,7 +234,9 @@ public class UserController {
     )
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/deleteUser/{id}")//刪除
-    public ResponseEntity<String> dodeleteById(@PathVariable Integer id) {
+    public ResponseEntity<String> dodeleteById(
+            @Parameter(description = "要刪除的使用者id")
+            @PathVariable Integer id) {
         if (userService.existsById(id)) {
             userService.deleteById(id);
             return ResponseEntity.ok("delete");

@@ -16,7 +16,6 @@ public interface UserService  {
     User insertUser(User Entity);
     void deleteById(Integer id);
     User findUser(String name);
-    User getUserByNameAndPassword(String name, String password) throws UsernameNotFoundException;
     int resetPassword(UserResetPasswordRequest userResetPasswordRequest);
     User register(UserRegisterRequest userRegisterRequest);
     User login(UserLoginRequest userLoginRequest);

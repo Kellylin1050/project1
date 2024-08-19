@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,7 +48,9 @@ public class DataInitializer {
             User admin = new User();
             admin.setUsername("admin");
             admin.setName("admin");
-            admin.setPassword(passwordEncoder.encode("admin"));
+            String rawPassword = "admin";
+            String hashedPassword = DigestUtils.md5DigestAsHex(rawPassword.getBytes());
+            admin.setPassword(hashedPassword);
             admin.setEmail("admin@gmail.com");
             admin.setEnabled(true);
             Role userRole = roleRepository.findByName("ROLE_ADMIN");

@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "使用者登入要求")
 public class UserLoginRequest {
-    @Schema(description = "使用者姓名", example = "jack3840")
+    @Schema(description = "使用者姓名", example = "admin")
     @NotBlank
     @Email
     private String username;
 
-    @Schema(description = "密碼", example = "485027cjeo3d")
+    @Schema(description = "密碼", example = "admin")
     @NotBlank
     private String password;
 

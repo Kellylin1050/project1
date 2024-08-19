@@ -44,7 +44,9 @@ public class NewBookController {
             @ApiResponse(responseCode = "500", description = "伺服器錯誤")
     })
     @GetMapping("/book")
-    public ResponseEntity<String> findNewBook(@RequestParam String title){
+    public ResponseEntity<String> findNewBook(
+            @Parameter(description = "查詢書名", required = true, allowEmptyValue = false)
+            @RequestParam String title){
         try {
             NewBook newBook = newBookService.getNewBookByTitle(title);
             if (newBook != null) {
@@ -60,8 +62,8 @@ public class NewBookController {
     }
 
     @Operation(
-            summary = "更新新書訊息",
-            description = "根據提供的訊息更新新書。"
+            summary = "更新書的訊息",
+            description = "根據提供的訊息更新書。"
     )
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/doUpdateNewBook")
@@ -75,10 +77,10 @@ public class NewBookController {
     }
 
     @Operation(
-            summary = "新增新書",
-            description = "新增一本新的書籍。",
+            summary = "新增書籍",
+            description = "新增一本書籍。",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "新書訊息",
+                    description = "書籍訊息",
                     required = true,
                     content = @Content(
                             schema = @Schema(implementation = NewBook.class)
@@ -86,11 +88,10 @@ public class NewBookController {
             )
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "新書創建成功"),
+            @ApiResponse(responseCode = "201", description = "書籍創建成功"),
             @ApiResponse(responseCode = "500", description = "伺服器錯誤")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "bearer-key")
     @PostMapping("/doSaveNewBook")
     public ResponseEntity<?> doSaveNewBook (@RequestBody @Valid NewBook entity) {
         NewBook newBook = newBookService.saveNewBook(entity);
@@ -101,8 +102,8 @@ public class NewBookController {
     }
 
     @Operation(
-            summary = "刪除新書",
-            description = "根據書籍 ID 刪除指定的新書。",
+            summary = "刪除書籍",
+            description = "根據書籍 ID 刪除指定的書籍。",
             parameters = {
                     @Parameter(name = "id", description = "書籍 ID", required = true, schema = @Schema(type = "integer"))
             }
@@ -113,7 +114,9 @@ public class NewBookController {
     })
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping ("/delete/{id}")
-    public ResponseEntity<String> doDeleteById (@PathVariable Integer id) {
+    public ResponseEntity<String> doDeleteById (
+            @Parameter(description = "要刪除書本的id")
+            @PathVariable Integer id) {
         if (newBookService.existsById(id)) {
             newBookService.deleteById(id);
             return ResponseEntity.ok("delete");
