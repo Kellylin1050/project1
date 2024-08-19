@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody ;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -170,6 +172,8 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/updateUser")
     public ResponseEntity<String> doUpdateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("User Roles: " + authentication.getAuthorities());
         int result = userService.updateUser(userUpdateRequest);
         if (result == 1) {
             return ResponseEntity.status(HttpStatus.OK).body("User updated successfully");

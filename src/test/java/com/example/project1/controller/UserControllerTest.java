@@ -258,9 +258,7 @@ public class UserControllerTest {
         // 登錄用戶
         UserLoginRequest userLoginRequest = new UserLoginRequest();
         userLoginRequest.setUsername(userRegisterRequest.getUsername());
-        //userLoginRequest.setUsername("xxx");
         userLoginRequest.setPassword(userRegisterRequest.getPassword());
-        //userLoginRequest.setPassword("12345678");
 
         MvcResult loginResult = mockMvc.perform(MockMvcRequestBuilders.post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -287,7 +285,7 @@ public class UserControllerTest {
 
         // 驗證登出後的行為
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
-        userUpdateRequest.setId(2);
+        userUpdateRequest.setId(11);
         userUpdateRequest.setName("fjdig");
         userUpdateRequest.setPhone("0937485123");
         userUpdateRequest.setUsername("fjdig");
@@ -308,7 +306,7 @@ public class UserControllerTest {
     @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoUpdateUser() throws Exception{
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
-        userUpdateRequest.setId(3);
+        userUpdateRequest.setId(11);
         userUpdateRequest.setName("fjdig");
         userUpdateRequest.setPhone("0937485123");
         userUpdateRequest.setUsername("fjdig");
@@ -369,7 +367,7 @@ public class UserControllerTest {
     @Test
     public void testdoResetPassword() throws Exception{
         UserResetPasswordRequest userResetPasswordRequest = new UserResetPasswordRequest();
-        userResetPasswordRequest.setId(4);
+        userResetPasswordRequest.setId(12);
         userResetPasswordRequest.setPassword("448r9f693v");
         userService.resetPassword(userResetPasswordRequest);
         String json = objectMapper.writeValueAsString(userResetPasswordRequest);

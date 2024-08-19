@@ -99,8 +99,6 @@ public class User {
         this.enabled = enabled;
     }
 
-//    public boolean isPresent() {
-//        return false;
-//    }
+
 }
 

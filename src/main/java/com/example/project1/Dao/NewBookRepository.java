@@ -22,7 +22,7 @@ public interface NewBookRepository extends JpaRepository<NewBook,Integer> {
     NewBook getNewBookByTitle(String title);
 
     @Modifying
-    //@Transactional
+    @Transactional
     @Query("UPDATE NewBook nb SET nb.title = :title, nb.author = :author, nb.description = :description ,nb.price = :price ,nb.sellprice = :sellprice WHERE nb.id = :id")
     int updateNewBook(Integer id, String title, String author, String description, Integer price, Integer sellprice );
 }

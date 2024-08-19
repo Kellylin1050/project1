@@ -15,12 +15,12 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     @Query("SELECT u FROM User u WHERE u.username = :username")
     User getUserByUsername(String username);
     @Modifying
-    //@Transactional
+    @Transactional
     @Query("UPDATE User u SET u.name = :name, u.username = :username, u.phone = :phone WHERE u.id = :id")
     int updateUser(Integer id, String name, String username, String phone);
 
     @Modifying
-    //@Transactional
+    @Transactional
     @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
     int resetPassword(Integer id, String password);
     @Query("SELECT u FROM User u WHERE u.username = :username AND u.password = :password")
