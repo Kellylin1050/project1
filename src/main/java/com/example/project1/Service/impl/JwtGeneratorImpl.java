@@ -19,28 +19,6 @@ import java.util.Map;
 @Service
 @PropertySource(value = {"classpath:application.properties"})
 public class JwtGeneratorImpl implements JwtGeneratorService {
-
-
-/*   public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder()
-                .claim()
-                .add(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 + 24))
-                .and()
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-
-    }
-
-    private Key getSigningKey() {
-        byte[] keyBytes = this.secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-    */
-
-
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
 
@@ -93,25 +71,6 @@ public class JwtGeneratorImpl implements JwtGeneratorService {
             System.out.println("Token is invalid: " + e.getMessage());
             return false;
         }
-        /*try {
-            if (tokenBlacklistService.isTokenBlacklisted(token)) {
-                return false;
-        }
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
-            return true;
-        }
-        catch (Exception e) {
-          return false;
-        }
-        try {
-            if (tokenBlacklistService.isTokenBlacklisted(token)) {
-                return false;
-            }
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new RuntimeException("Expired or Invalid JWT token", e);
-        }*/
     }
 
     public String getUsernameFromToken(String token) {

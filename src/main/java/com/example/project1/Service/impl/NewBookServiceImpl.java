@@ -19,10 +19,6 @@ public class NewBookServiceImpl implements NewBookService {
     public int updateNewBook(NewBookRequest newBookRequest) {
        return newBookRepository.updateNewBook(newBookRequest.getId(),newBookRequest.getTitle(),newBookRequest.getAuthor(),newBookRequest.getDescription(),newBookRequest.getPrice(),newBookRequest.getSellprice());
     }
-    /*@Override
-    public Optional<NewBook> findById(Integer id) {
-        return newBookRepository.findById (id);
-    }*/
     @Override
     public NewBook saveNewBook(NewBook entity) {
         return newBookRepository.save(entity);
@@ -38,10 +34,9 @@ public class NewBookServiceImpl implements NewBookService {
 
     }
 
+    @Override
+    public boolean existsById(Integer id) {
+        return newBookRepository.existsById(id);
+    }
 
-
-    /*@Override
-    public NewBook getNewBookById(Integer id) {
-        return newBookRepository.getNewBookById(id);
-    }*/
 }

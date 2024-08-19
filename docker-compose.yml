@@ -1,0 +1,37 @@
+#version: '4.0'
+#services:
+#  db:
+#    image: project1:latest
+#    ports:
+#      - '3306:3306'
+#    volumes:
+#      - db:/data/db
+#volumes:
+#  db:
+#    driver:
+#      local
+#version: '3'
+#
+#services:
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/project1?serverTimezone=Asia/Taipei&characterEncoding=utf-8
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root
+#
+#  db:
+#    image: project1:latest
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MARIADB_DATABASE: project1
+#      MARIADB_USER: root
+#      MARIADB_PASSWORD: root
+#      #MYSQL_ROOT_PASSWORD: root_password

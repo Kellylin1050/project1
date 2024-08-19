@@ -1,15 +1,31 @@
 package com.example.project1.security;
 
 import com.example.project1.Dao.RoleRepository;
+import com.example.project1.Dao.UserRepository;
 import com.example.project1.Entity.Role;
+import com.example.project1.Entity.User;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class DataInitializer {
     @Autowired
     private RoleRepository roleRepository;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public DataInitializer(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostConstruct
     public void init() {
@@ -26,6 +42,17 @@ public class DataInitializer {
             Role userRole = new Role();
             userRole.setName("ROLE_USER");
             roleRepository.save(userRole);
+        }
+        if (userRepository.getUserByUsername("admin") == null) {
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setName("admin");
+            admin.setPassword(passwordEncoder.encode("admin"));
+            admin.setEmail("admin@gmail.com");
+            admin.setEnabled(true);
+            Role userRole = roleRepository.findByName("ROLE_ADMIN");
+            admin.setRoles(Collections.singleton(userRole));
+            userRepository.save(admin);
         }
     }
 }

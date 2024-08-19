@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,36 +56,16 @@ public class NewBookController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred: " + e.getMessage());
-        }   /*newBookService.getNewBookByTitle(title);
-        if (title != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(title);
-        }else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        try {
-            List<NewBook> newBooks = newBookService.getNewBookByTitle(title);
-            if (newBooks != null && !newBooks.isEmpty()) {
-                return ResponseEntity.ok(title);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Book not found");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred: " + e.getMessage());
-        }*/
     }
 
     @Operation(
             summary = "更新新書訊息",
             description = "根據提供的訊息更新新書。"
-            //requestBody =@RequestBody(description = "新書更新訊息", required = true, content = @Content(schema = @Schema(implementation = NewBookRequest.class)))
     )
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/doUpdateNewBook")
     public ResponseEntity<String> doUpdateNewBook(@RequestBody NewBookRequest newBookRequest){
-        //newBookService.updateNewBook(id,newBookRequest);
-        //return ResponseEntity.status(HttpStatus.OK).body();
         int result = newBookService.updateNewBook(newBookRequest);
         if (result == 1) {
             return ResponseEntity.status(HttpStatus.OK).body("NewBook updated successfully");
@@ -92,13 +73,6 @@ public class NewBookController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("NewBook update failed");
         }
     }
-
-    /*@GetMapping("/doFindById/{id}")
-    public String doFindById(@PathVariable Integer id, Model model){
-        NewBook newBook = newBookService.getNewBookById(id);
-        //model.addAttribute("n", newBook);
-        return newBook ;
-    }*/
 
     @Operation(
             summary = "新增新書",
@@ -116,6 +90,7 @@ public class NewBookController {
             @ApiResponse(responseCode = "500", description = "伺服器錯誤")
     })
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearer-key")
     @PostMapping("/doSaveNewBook")
     public ResponseEntity<?> doSaveNewBook (@RequestBody @Valid NewBook entity) {
         NewBook newBook = newBookService.saveNewBook(entity);
@@ -139,20 +114,14 @@ public class NewBookController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping ("/delete/{id}")
     public ResponseEntity<String> doDeleteById (@PathVariable Integer id) {
-        newBookService.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).body("delete");
+        if (newBookService.existsById(id)) {
+            newBookService.deleteById(id);
+            return ResponseEntity.ok("delete");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
+        }
     }
 
-   /* @RequestMapping("/new")
-    public String doNewBookAddUI(){
-        return "newBook_adds";
-    }
-   @RequestMapping("/")
-    public String doNewBookUI(Model model){
-        List<NewBook> newBookList=newBookService.findNewBook();
-        model.addAttribute("NewBookList", newBookList);
-        return "index";
-    }*/
    @Operation(
            summary = "403錯誤頁面",
            description = "返回403錯誤頁面"

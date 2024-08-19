@@ -56,39 +56,36 @@ public class NewBookControllerTest {
 
 
     @Test
+    @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testFindNewBook() throws Exception {
+        NewBookRequest bookRequest = new NewBookRequest();
+        bookRequest.setTitle("The idea of you");
+        bookRequest.setAuthor("Robinne");
+        bookRequest.setPrice(942);
+        bookRequest.setSellprice(784);
+        String json = objectMapper.writeValueAsString(bookRequest);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/NewBook/doSaveNewBook")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isCreated());
+
         String title = "The idea of you";
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
+        RequestBuilder requestBuilder1 = MockMvcRequestBuilders
                 .get("/NewBook/book")
                 .param("title", title);
 
-        mockMvc.perform(requestBuilder)
+        mockMvc.perform(requestBuilder1)
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(title));
-        /*String title = "The idea of you";
-
-        String json = objectMapper.writeValueAsString(title);
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/NewBook/book")
-                .param("title", title)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(title));*/
-
-
     }
-
-
-
     @Test
     @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoUpdateNewBook() throws Exception{
         NewBookRequest bookRequest = new NewBookRequest();
-        bookRequest.setId(20);
+        bookRequest.setId(3);
         bookRequest.setTitle("test");
         bookRequest.setAuthor("test");
         bookRequest.setPrice(394);
@@ -103,26 +100,6 @@ public class NewBookControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
     }
-
-    /*@Test
-    @WithMockUser(username = "admin",roles = {"ADMIN"})
-    public void testdoFindById() throws Exception{
-        NewBook book = new NewBook();
-        book.setId(1);
-        book.setTitle("The idea of you");
-        newBookService.findById(1);
-        String json = objectMapper.writeValueAsString(book);
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/NewBook/doFindById/{id}",1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk());
-                //.andExpect(MockMvcResultMatchers.content().string("newBook_update"));
-
-    }*/
-
     @Test
     @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoSaveNewBook() throws Exception{
@@ -145,7 +122,7 @@ public class NewBookControllerTest {
     @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoDeleteById() throws Exception{
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .delete("/NewBook/delete/{id}",21);
+                .delete("/NewBook/delete/{id}",2);
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
     }

@@ -3,6 +3,8 @@ package com.example.project1.Entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
+import lombok.Data;
+
 import java.util.*;
 
 @Schema(description = "User實體")
@@ -22,7 +24,7 @@ public class User {
     private String password;
     @Schema(description = "姓名", example = "William")
     private String name;
-    @Schema(description = "書名", example = "0947382645")
+    @Schema(description = "電話", example = "0947382645")
     private String phone;
 
     @Schema(description = "信箱", example = "William38201@gmail.com")
@@ -38,7 +40,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-    //private Collection<Role> roles;
+
 
     // Getters and Setters
 
@@ -92,5 +94,13 @@ public class User {
     public boolean isEnabled() {
         return enabled;
     }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+//    public boolean isPresent() {
+//        return false;
+//    }
 }
 

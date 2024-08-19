@@ -22,7 +22,6 @@ public interface UserService  {
     User login(UserLoginRequest userLoginRequest);
 
     boolean existsById(Integer id);
-    //List<User> findByEmail(String email);
-    //Map<String, String> generateToken(User user);
+
 
 }
