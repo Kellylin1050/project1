@@ -30,13 +30,47 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 建立controller單元測試、集成測試
 使用swagger產生API文件，方便快速了解及測試API
 
-## 環境設置
+## 系統架構設計
+### 環境設置
 - 編輯器：Intellij
 - 開發語言：JAVA 17
 - 使用框架：Springboot 3.2.5
 - Project管理工具：Maven
 - 版控工具：Git、sourceTree介面化工具
 - 資料庫：MariaDB
+### 系統組件
+- **API 層**:
+  - **Controller**: 處理 HTTP 請求
+  - **路由**: 定義 API 路徑和請求方法
+  - **DTO**: 請求和響應數據結構
+
+- **業務邏輯層**:
+  - **Service**: 業務邏輯處理
+
+- **數據訪問層**:
+  - **Repository**: 資料庫操作
+  - **Spring Data JPA**: JPA 數據訪問
+
+- **身份驗證和授權**:
+  - **Spring Security**: 身份驗證和授權
+  - **JWT**: 令牌處理
+
+- **配置和管理**:
+  - **配置文件**: `application.properties` 
+  - **環境配置**: 開發、測試、生產環境
+
+### 系統設計
+- **資料庫設計**: 表結構、字段、關聯
+- **API 設計**: 路徑、HTTP 方法、錯誤處理
+
+### 測試和部署
+- **測試**: 單元測試、集成測試
+- **部署**: Docker
+
+### 文檔和維護
+- **API 文檔**: Swagger
+- **維護計劃**: 定期檢查和更新
+
 ### MariaDB資料庫(設計、關聯、索引)
 ### 資料表設計
 
