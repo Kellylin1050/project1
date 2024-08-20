@@ -28,6 +28,7 @@ public class User {
     private String phone;
 
     @Schema(description = "信箱", example = "William38201@gmail.com")
+    @Column(nullable = false,unique = true)
     private String email;
 
     private boolean enabled;
