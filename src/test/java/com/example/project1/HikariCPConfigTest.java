@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 
 public class HikariCPConfigTest {
 
-    // 使用實際的數據庫配置進行測試
     private static final String DRIVER = "org.mariadb.jdbc.Driver";
     private static final String URL = "jdbc:mariadb://localhost:3307/project1?serverTimezone=Asia/Taipei&characterEncoding=utf-8";
     private static final String USERNAME = "root";
@@ -81,20 +80,6 @@ public class HikariCPConfigTest {
         } finally {
             hikariDataSource.close();
         }
-        /*try (Connection connection = hikariDataSource.getConnection()) {
-            assertNotNull(connection);
-
-            // 替換成存在於你數據庫中的表名稱
-            PreparedStatement preparedStatement = connection.prepareStatement("select * from user;");
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            // 確保有結果返回
-            assertTrue(resultSet.next());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            hikariDataSource.close();
-        }*/
     }
 
     public static List<String> executeQuery(Connection conn) throws SQLException {

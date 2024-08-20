@@ -171,9 +171,8 @@ public class UserController {
                 @ApiResponse(responseCode = "200", description = "成功返回使用者"),
                 @ApiResponse(responseCode = "404", description = "使用者未找到"),
                 @ApiResponse(responseCode = "500", description = "伺服器錯誤")
-    }
+             }
     )
-
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/user") //查
     public ResponseEntity<?> findUser(
@@ -200,8 +199,6 @@ public class UserController {
                     .body("An error occurred: " + e.getMessage());
         }
     }
-
-
 
     @Operation(
             summary = "更新使用者訊息",
@@ -234,7 +231,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User update failed");
         }
     }
-
 
     @Operation(
             summary = "新增使用者",
