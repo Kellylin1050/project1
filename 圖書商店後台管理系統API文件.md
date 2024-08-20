@@ -499,7 +499,7 @@ Response Example
 | 參數名稱     | 必要 | 資料型態    | 參數敘述              |
 | ------------ | ---- | ----------- | --------------------- |
 | accessToken  | Y    | String(255) | 新的有效Token        |
-| refreshToken | Y    | String(255) | 登入時獲得的更新Token |
+| refreshToken | Y    | String(255) | 獲得的更新Token |
 
 ```json=
 {
