@@ -24,6 +24,7 @@ Content-Type: application/json
 
 ### JWT token
 當使用者成功登入後可以獲得JWT token，過期時間預設為一小時
+
 Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 
 ### API測試
