@@ -86,12 +86,14 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 
 
 ### Docker 
-安裝docker
+**安裝docker**
+
 `$ docker build -t <image_name> .`：從 Dockerfile 建立 image。
 
 `$ docker run -dp <host_port>:<container_port> --name <container_name> --env-file ./.env <image_name>`：從 image 建立 container，並讀入環境變數。
 
 **打包成映像檔**
+
 `$ docker tag local-image:tagname new-repo:tagname .` 將我們現有的image標記成新的repo
 
 `$ docker tag local-image:tagname new-repo:tagname .`使用docker push推送到hub
@@ -574,7 +576,7 @@ Request Example
 | price       | Y    | INT(11)     | 定價     |
 | sellprice   | Y    | INT(11)     | 售價     |
 
-```json
+```json=
 {
   "title": "Java Programming",
   "author": "John Doe",
@@ -586,7 +588,7 @@ Request Example
 ```
 Response Example
 
-```json
+```json=
 Book updated successfully
 ```
 **API回應說明**
@@ -606,7 +608,7 @@ Request Example
 | price       | Y    | INT(11)     | 定價     |
 | sellprice   | Y    | INT(11)     | 售價     |
 
-```json
+```json=
 {
   "title": "Slow Dance",
   "author": "Rainbow Rowell",
@@ -618,7 +620,7 @@ Request Example
 ```
 Response Example
 
-```json
+```json=
 Book save successfully
 ```
 **API回應說明**
@@ -643,7 +645,7 @@ Request Example
 
 Response Example
 
-```json
+```json=
 Book with ID 5 deleted successfully
 ```
 **API回應說明**
