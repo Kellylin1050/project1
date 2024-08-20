@@ -38,7 +38,7 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 - Project管理工具：Maven
 - 版控工具：Git、sourceTree介面化工具
 - 資料庫：MariaDB
-### 系統組件
+### 系統組成
 - **API 層**:
   - **Controller**: 處理 HTTP 請求
   - **路由**: 定義 API 路徑和請求方法
