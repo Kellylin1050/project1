@@ -56,7 +56,7 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
   - **JWT**: 令牌處理
 
 - **配置和管理**:
-  - **配置文件**: `application.properties` 
+  - **配置文件**: `application.properties`, Config
   - **環境配置**: 開發、測試、生產環境
 
 ### 系統設計
