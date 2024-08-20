@@ -1,16 +1,15 @@
 package com.example.project1.Controller;
 
 import com.example.project1.Dao.RoleRepository;
-import com.example.project1.Dto.UserLoginRequest;
-import com.example.project1.Dto.UserRegisterRequest;
-import com.example.project1.Dto.UserResetPasswordRequest;
-import com.example.project1.Dto.UserUpdateRequest;
+import com.example.project1.Dto.*;
+import com.example.project1.Entity.Role;
 import com.example.project1.Entity.User;
 import com.example.project1.Service.JwtGeneratorService;
 import com.example.project1.Service.UserService;
 import com.example.project1.Service.impl.TokenBlacklistService;
 import com.example.project1.Service.impl.UserServiceImpl;
 import com.example.project1.security.AuthResponse;
+import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,6 +32,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Tag(name = "User管理",description = "管理user的相關API")
@@ -44,45 +44,6 @@ public class UserController {
     private JwtGeneratorService jwtGeneratorService;
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
-
-
-    @Autowired
-    public UserController(UserService userService, JwtGeneratorService jwtGeneratorService) {
-        this.userService = userService;
-        this.jwtGeneratorService = jwtGeneratorService;
-    }
-
-    @Operation(
-            summary = "查詢使用者",
-            description = "返回指定使用者",
-            parameters = {
-                    @Parameter(name = "username", description = "要查詢的使用者名稱", required = true, schema = @Schema(type = "string"))
-            },
-            responses = {
-                @ApiResponse(responseCode = "200", description = "成功返回使用者"),
-                @ApiResponse(responseCode = "404", description = "使用者未找到"),
-                @ApiResponse(responseCode = "500", description = "伺服器錯誤")
-    }
-    )
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/user") //查
-    public ResponseEntity<?> findUser(
-            @Parameter(description = "查詢使用者名稱", required = true, allowEmptyValue = false)
-            @RequestParam String username) {
-        try {
-            User user = userService.findUser(username);
-            if (user != null) {
-                return ResponseEntity.ok(username); // 返回用户对象
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("User not found"); // 用户未找到
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred: " + e.getMessage());
-        }
-    }
 
     @Operation(
             summary = "用戶註冊",
@@ -99,9 +60,10 @@ public class UserController {
             userRegisterRequest.setRoles(Collections.singleton("USER"));
             // 使用者註冊
             userService.register(userRegisterRequest);
-            return new ResponseEntity<>(userRegisterRequest, HttpStatus.CREATED);
+            String successMessage = "使用者 " + userRegisterRequest.getUsername() + " 註冊成功";
+            return new ResponseEntity<>(successMessage, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("使用者註冊失敗: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -125,9 +87,11 @@ public class UserController {
         }
         String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
         if (user.getPassword().equals(hashedPassword)) {
-            Map<String, String> tokenMap = jwtGeneratorService.generateToken(userLoginRequest);
+            Map<String, String> tokenMap = jwtGeneratorService.generateToken(userLoginRequest.getUsername());
             String token = tokenMap.get("token");
-            return ResponseEntity.ok(new AuthResponse(token, "login successful"));
+            String refreshToken = jwtGeneratorService.generateRefreshToken(userLoginRequest.getUsername());
+
+            return ResponseEntity.ok(new AuthResponse(token,refreshToken,"login Successful"));
         } else {
             logger.info("username {} 的密碼不正確", userLoginRequest.getUsername());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
@@ -160,11 +124,91 @@ public class UserController {
     }
 
 
+    @Autowired
+    public UserController(UserService userService, JwtGeneratorService jwtGeneratorService) {
+        this.userService = userService;
+        this.jwtGeneratorService = jwtGeneratorService;
+    }
+
+    @Operation(
+            summary = "查詢所有使用者",
+            description = "返回所有使用者的詳細訊息。",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "成功返回所有使用者"),
+                    @ApiResponse(responseCode = "404", description = "未找到使用者")
+            }
+    )
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/doFindAllUsers")
+    public ResponseEntity<Object> doFindAllUsers(Model model) {
+        List<User> users = userService.findAllUser();
+        if (!users.isEmpty()) {
+            List<UserResponse> userResponseDTOs = users.stream()
+                    .map(user -> new UserResponse(
+                            user.getName(),
+                            user.getEmail(),
+                            user.getUsername(),
+                            user.getRoles().stream()
+                                    .map(Role::getName)
+                                    .collect(Collectors.toSet())
+                    ))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("u", userResponseDTOs);
+            return ResponseEntity.status(HttpStatus.OK).body(userResponseDTOs);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("未找到使用者");
+        }
+    }
+
+    @Operation(
+            summary = "查詢指定使用者",
+            description = "返回指定使用者",
+            parameters = {
+                    @Parameter(name = "username", description = "要查詢的使用者名稱", required = true, schema = @Schema(type = "string"))
+            },
+            responses = {
+                @ApiResponse(responseCode = "200", description = "成功返回使用者"),
+                @ApiResponse(responseCode = "404", description = "使用者未找到"),
+                @ApiResponse(responseCode = "500", description = "伺服器錯誤")
+    }
+    )
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/user") //查
+    public ResponseEntity<?> findUser(
+            @Parameter(description = "查詢使用者名稱", required = true, allowEmptyValue = false)
+            @RequestParam String username) {
+        try {
+            User user = userService.findUser(username);
+            if (user != null) {
+                UserResponse userResponseDTO = new UserResponse(
+                        user.getName(),
+                        user.getEmail(),
+                        user.getUsername(),
+                        user.getRoles().stream()
+                                .map(Role::getName)
+                                .collect(Collectors.toSet())
+                );
+                return ResponseEntity.ok(userResponseDTO);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred: " + e.getMessage());
+        }
+    }
+
+
+
     @Operation(
             summary = "更新使用者訊息",
             description = "根據提供的訊息更新使用者。",
             responses = {
                     @ApiResponse(responseCode = "200", description = "使用者更新成功"),
+                    @ApiResponse(responseCode = "404", description = "使用者未找到"),
                     @ApiResponse(responseCode = "400", description = "更新失敗")
             }
     )
@@ -172,36 +216,25 @@ public class UserController {
     @PostMapping("/updateUser")
     public ResponseEntity<String> doUpdateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("User Roles: " + authentication.getAuthorities());
+        String currentUsername = authentication.getName();
+        User existingUser = userService.findUser(currentUsername);
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        String originalName = existingUser.getName();
         int result = userService.updateUser(userUpdateRequest);
         if (result == 1) {
-            return ResponseEntity.status(HttpStatus.OK).body("User updated successfully");
+            String updatedName = userUpdateRequest.getName();
+            String responseMessage = String.format(
+                    "USER %s updated successfully",
+                    updatedName != null ? updatedName : originalName
+            );
+            return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User update failed");
         }
     }
 
-    @Operation(
-            summary = "根據 ID 查詢使用者",
-            description = "根據使用者 ID 返回指定使用者的詳細訊息。",
-            parameters = {
-                    @Parameter(name = "id", description = "使用者 ID", required = true, schema = @Schema(type = "integer"))
-            },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "成功返回使用者"),
-                    @ApiResponse(responseCode = "404", description = "使用者未找到")
-            }
-    )
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/doFindById/{id}")
-    public ResponseEntity<Object> dofindById(
-            @Parameter(description = "要查詢的使用者id")
-            @PathVariable Integer id, Model model) {
-        Optional<User> user = userService.findById(id);
-        model.addAttribute("u", user);
-        Optional<User> updatedUser = userService.findById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
-    }
 
     @Operation(
             summary = "新增使用者",
@@ -213,12 +246,17 @@ public class UserController {
     )
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/doSaveUser")
-    public ResponseEntity<User> doSaveUser(@RequestBody @Valid User entity) {
-        User userId = userService.insertUser(entity);
-        if (userId == null) {
+    public ResponseEntity<Object> doSaveUser(@RequestBody @Valid User entity) {
+        User savedUser = userService.insertUser(entity);
+        if (savedUser == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+        String successMessage = "使用者 " + savedUser.getUsername() + " 創建成功";
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", successMessage);
+        responseBody.put("user", savedUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
     @Operation(
@@ -239,15 +277,15 @@ public class UserController {
             @PathVariable Integer id) {
         if (userService.existsById(id)) {
             userService.deleteById(id);
-            return ResponseEntity.ok("delete");
+            return ResponseEntity.ok("User with ID " + id + " deleted successfully");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 
     @Operation(
-            summary = "重置密碼",
-            description = "根據提供的重置密碼請求重置使用者的密碼。",
+            summary = "忘記密碼",
+            description = "根據提供的請求重置使用者的密碼。",
             responses = {
                     @ApiResponse(responseCode = "200", description = "密碼重置成功"),
                     @ApiResponse(responseCode = "400", description = "使用者未找到或重置密碼失敗")
@@ -262,7 +300,44 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
         }
     }
+    @Operation(
+            summary = "更新Token",
+            description = "提供更新的Token",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "成功更新Token"),
+                    @ApiResponse(responseCode = "400", description = "缺少Token"),
+                    @ApiResponse(responseCode = "403", description = "無效的Token"),
+                    @ApiResponse(responseCode = "500", description = "伺服器錯誤")
+            }
+    )
+    @PostMapping ("/refreshToken")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request){
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Refresh token is missing"));
+        }
+        try {
+            if (jwtGeneratorService.validateRefreshToken(refreshToken)) {
+                String username = jwtGeneratorService.getUsernameFromToken(refreshToken);
+                Map<String, String> tokenMap = jwtGeneratorService.generateToken(username);
+                String newAccessToken = tokenMap.get("token");
+                String newRefreshToken = jwtGeneratorService.generateRefreshToken(username);
 
+                Map<String, String> response = new HashMap<>();
+                response.put("accessToken", newAccessToken);
+                response.put("refreshToken", newRefreshToken);
+
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonMap("message", "Invalid refresh token"));
+            }
+        } catch (JwtException e) {
+            logger.error("JWT processing error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Jwt processing error"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An unexpected error occurred"));
+        }
+    }
     @Operation(
             summary = "403錯誤頁面",
             description = "返回403錯誤頁面"

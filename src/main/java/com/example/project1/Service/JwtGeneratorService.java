@@ -8,9 +8,14 @@ import java.util.Map;
 
 @Service
 public interface JwtGeneratorService {
-    Map<String, String> generateToken(UserLoginRequest userLoginRequest);
+    Map<String, String> generateToken(String username);
+    String generateRefreshToken(String username);
 
     String resolveToken(HttpServletRequest request);
 
     boolean validateToken(String token);
+    boolean validateRefreshToken(String token);
+    String getUsernameFromToken(String token);
+
+
 }

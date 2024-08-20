@@ -48,8 +48,14 @@ public class JwtRequestFilter extends OncePerRequestFilter implements JwtRequest
 	public void processJwtRequest(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
-		//final
-		String requestTokenHeader = request.getHeader("Authorization");
+		String path = request.getRequestURI();
+		if (path.startsWith("/users/refreshToken")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		final String requestTokenHeader = request.getHeader("Authorization");
+		logger.info("header: " + requestTokenHeader);
 
 		String jwtToken = null;
 		String username = request.getParameter("username");

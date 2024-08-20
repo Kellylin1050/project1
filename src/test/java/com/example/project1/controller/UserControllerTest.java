@@ -29,8 +29,6 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,10 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes={Project1Application.class},webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
-//@MapperScan(basePackages = "com.example.project1.Dao.UserDao")
-//@ContextConfiguration(locations ="classpath:application.properties")
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -159,12 +154,13 @@ public class UserControllerTest {
     public void login_success() throws Exception {
         // 先註冊新帳號
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setEmail("test12@gmail.com");
+        userRegisterRequest.setEmail("test54@gmail.com");
         userRegisterRequest.setPassword("12345");
         userRegisterRequest.setName("mmm");
         userRegisterRequest.setUsername("mmm");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/users/register")
+                        //.header("Authorization")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegisterRequest)))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
@@ -288,7 +284,6 @@ public class UserControllerTest {
         userUpdateRequest.setId(11);
         userUpdateRequest.setName("fjdig");
         userUpdateRequest.setPhone("0937485123");
-        userUpdateRequest.setUsername("fjdig");
 
         String json = objectMapper.writeValueAsString(userUpdateRequest);
         MockHttpServletRequestBuilder updateRequestBuilder = MockMvcRequestBuilders
@@ -309,7 +304,7 @@ public class UserControllerTest {
         userUpdateRequest.setId(11);
         userUpdateRequest.setName("fjdig");
         userUpdateRequest.setPhone("0937485123");
-        userUpdateRequest.setUsername("fjdig");
+
         String json = objectMapper.writeValueAsString(userUpdateRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -321,19 +316,35 @@ public class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testDoFindAllUsers() throws Exception {
+        User user = new User();
+        user.setId(13);
+        //user.setUsername("qqq");
+        //List<User> users = Collections.singletonList(user);
+        //when(userService.findAllUser()).thenReturn(users);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/users/doFindAllUsers")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+                //.andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(13))
+                //.andExpect(MockMvcResultMatchers.jsonPath("$[0].username").value("qqq"));
+    }
+
+
+    /*@Test
     @WithMockUser(username = "admin",roles = {"ADMIN"})
-    public void testdoFindById() throws Exception{
+    public void testdoFindAllUser() throws Exception{
         User user = new User();
         user.setId(1);
-        userService.findById(1);
         String json = objectMapper.writeValueAsString(user);
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/users/doFindById/{id}",1)
+                .get("/users/doFindAllUsers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json);
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
-    }
+    }*/
 
     @Test
     @WithMockUser(username = "admin",roles = {"ADMIN"})
@@ -357,7 +368,7 @@ public class UserControllerTest {
     @WithMockUser(username = "admin",roles = {"ADMIN"})
     public void testdoDeleteById()throws Exception{
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .delete("/users/deleteUser/{id}",2);
+                .delete("/users/deleteUser/{id}",12);
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(content().string("delete"));

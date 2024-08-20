@@ -21,7 +21,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Tag(name = "Book管理",description = "管理Book的相關API")
@@ -32,8 +34,8 @@ public class NewBookController {
     private NewBookService newBookService;
 
     @Operation(
-            summary = "查詢新書",
-            description = "根據書名查詢新書訊息。",
+            summary = "查詢書籍",
+            description = "根據書名查詢書籍訊息。",
             parameters = {
                     @Parameter(name = "title", description = "書名", required = true, schema = @Schema(type = "string"))
             }
@@ -50,7 +52,7 @@ public class NewBookController {
         try {
             NewBook newBook = newBookService.getNewBookByTitle(title);
             if (newBook != null) {
-                return ResponseEntity.ok(title);
+                return ResponseEntity.ok( "Successfully found the book : "+ title);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("Book not found");
@@ -65,14 +67,18 @@ public class NewBookController {
             summary = "更新書的訊息",
             description = "根據提供的訊息更新書。"
     )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "成功更新書籍"),
+            @ApiResponse(responseCode = "400", description = "書籍更新失敗")
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/doUpdateNewBook")
     public ResponseEntity<String> doUpdateNewBook(@RequestBody NewBookRequest newBookRequest){
         int result = newBookService.updateNewBook(newBookRequest);
         if (result == 1) {
-            return ResponseEntity.status(HttpStatus.OK).body("NewBook updated successfully");
+            return ResponseEntity.status(HttpStatus.OK).body("Book updated successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("NewBook update failed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Book update failed");
         }
     }
 
@@ -98,7 +104,11 @@ public class NewBookController {
         if (newBook == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("NewBook save successfully");
+        String successMessage = " 書籍 " + newBook.getTitle() + " 創建成功 ";
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", successMessage);
+        responseBody.put("Book",newBook);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Book save successfully" );
     }
 
     @Operation(
@@ -119,7 +129,7 @@ public class NewBookController {
             @PathVariable Integer id) {
         if (newBookService.existsById(id)) {
             newBookService.deleteById(id);
-            return ResponseEntity.ok("delete");
+            return ResponseEntity.ok("Book with ID " + id + " deleted successfully");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found");
         }

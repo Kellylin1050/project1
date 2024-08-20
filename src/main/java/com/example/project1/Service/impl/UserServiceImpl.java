@@ -43,12 +43,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int updateUser(UserUpdateRequest userUpdateRequest) {
-        return userRepository.updateUser(userUpdateRequest.getId(), userUpdateRequest.getName(), userUpdateRequest.getUsername(), userUpdateRequest.getPhone());
+        return userRepository.updateUser(userUpdateRequest.getId(), userUpdateRequest.getName(), userUpdateRequest.getPhone());
     }
 
     @Override
-    public Optional<User> findById(Integer id) {
-        return userRepository.findById(id);
+    public List<User> findAllUser() {
+        return userRepository.findAllUser();
     }
 
     @Override

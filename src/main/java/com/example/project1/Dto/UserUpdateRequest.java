@@ -11,8 +11,8 @@ public class UserUpdateRequest {
     private String name;
     @Schema(description = "電話", example = "0947382613")
     private String phone;
-    @Schema(description = "使用者姓名", example = "Diana_liu")
-    private String username;
+    //@Schema(description = "使用者姓名", example = "Diana_liu")
+    //private String username;
 
 
     // Getters and Setters
@@ -33,8 +33,8 @@ public class UserUpdateRequest {
     }
     public String getPhone(){return phone;}
     public void setPhone(String phone){this.phone = phone;}
-    public String getUsername(){return username;}
-    public void setUsername(String username){this.username = username;}
+    //public String getUsername(){return username;}
+    //public void setUsername(String username){this.username = username;}
 
 
 }

@@ -7,12 +7,13 @@ import com.example.project1.Dto.UserUpdateRequest;
 import com.example.project1.Entity.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 
 
 public interface UserService  {
     int updateUser(UserUpdateRequest userUpdateRequest);
-    Optional<User> findById(Integer id);
+    List<User> findAllUser();
     User insertUser(User Entity);
     void deleteById(Integer id);
     User findUser(String name);
