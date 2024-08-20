@@ -92,7 +92,7 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 
 `$ docker run -dp <host_port>:<container_port> --name <container_name> --env-file ./.env <image_name>`：
 
-從 image 建立 container，並讀入環境變數。
+從 image 建立 container
 
 **打包成映像檔**
 
