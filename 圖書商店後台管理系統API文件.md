@@ -5,8 +5,11 @@
 
 ## 基本訊息
 API Base URL: /v3/api-docs
+
 Content-Type: application/json
+
 認證方式: JWT（JSON Web Token）
+
 授權機制: 基於角色的權限控制
 
 ## 主要功能
