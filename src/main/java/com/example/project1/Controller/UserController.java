@@ -120,7 +120,7 @@ public class UserController {
         System.out.println("Is Token Valid: " + isValid); // Log validation result
 
         if (token != null && jwtGeneratorService.validateToken(token)) {
-            //tokenBlacklistService.addTokenToBlacklist(token); // 添加到黑名单
+
             tokenBlacklistService.addTokenToBlacklist(token, 600);//新增redis
             String Key = "accessToken:" + token;
             boolean deleted = redisTemplate.delete(Key);

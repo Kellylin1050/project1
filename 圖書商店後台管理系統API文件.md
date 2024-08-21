@@ -43,7 +43,7 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 - **API 層**:
   - **Controller**: 處理 HTTP 請求
   - **路由**: 定義 API 路徑和請求方法
-  - **DTO**: 請求和響應數據結構
+  - **DTO**: 請求和響應資料結構
 
 - **業務邏輯層**:
   - **Service**: 業務邏輯處理
@@ -166,7 +166,7 @@ redis-cli TTL accessToken:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyN
 | jjwt-impl           | API的具體實現，提供jwt操作功能     |
 | jjwt-jackson        | 使用jackson來處理jwt的功      |
 | mariadb-java-client | mariadb的jdbc驅動，用於連接資料庫 |
-| HiKaricp            | 管理數據庫連接，提高性能           |
+| HiKaricp            | 管理資料庫連接，提高性能           |
 | mybatis             | 簡化mybatis配置            |
 | swagger-ui          | 產生UI介面，提供API文件及測試      |
 | Docker              | 打包成映像檔                 |

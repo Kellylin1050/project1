@@ -33,9 +33,6 @@ public class JwtGeneratorImpl implements JwtGeneratorService {
     @Value("${jwt.secret}")
     private String secret;
 
-    //@Value("${jwt.refreshSecret}")
-    //private String refreshSecret;
-
     @Value("${jwt.header}")
     private String message;
 
