@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody ;
@@ -45,6 +46,8 @@ public class UserController {
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
 
+    @Autowired
+    private RedisTemplate<String ,Object> redisTemplate;
     @Operation(
             summary = "用戶註冊",
             description = "註冊一個新的使用者。",
@@ -103,7 +106,8 @@ public class UserController {
             description = "使當前使用者的 JWT 認證令牌失效。",
             responses = {
                     @ApiResponse(responseCode = "200", description = "登出成功"),
-                    @ApiResponse(responseCode = "400", description = "無效的認證令牌")
+                    @ApiResponse(responseCode = "400", description = "無效的認證令牌"),
+                    @ApiResponse(responseCode = "500", description = "無法刪除令牌")
             }
     )
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -116,9 +120,17 @@ public class UserController {
         System.out.println("Is Token Valid: " + isValid); // Log validation result
 
         if (token != null && jwtGeneratorService.validateToken(token)) {
-            tokenBlacklistService.addTokenToBlacklist(token); // 添加到黑名单
+            //tokenBlacklistService.addTokenToBlacklist(token); // 添加到黑名单
+            tokenBlacklistService.addTokenToBlacklist(token, 600);//新增redis
+            String Key = "accessToken:" + token;
+            boolean deleted = redisTemplate.delete(Key);
+            if (deleted){
             return ResponseEntity.ok("Successfully logged out");
-        } else {
+            }else {
+                return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to remove token");
+             }
+        }
+        else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
         }
     }
@@ -318,6 +330,8 @@ public class UserController {
                 Map<String, String> tokenMap = jwtGeneratorService.generateToken(username);
                 String newAccessToken = tokenMap.get("token");
                 String newRefreshToken = jwtGeneratorService.generateRefreshToken(username);
+
+                tokenBlacklistService.addTokenToBlacklist(refreshToken, 7 * 24 * 60 * 60);  //新增redis
 
                 Map<String, String> response = new HashMap<>();
                 response.put("accessToken", newAccessToken);

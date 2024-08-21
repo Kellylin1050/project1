@@ -17,5 +17,7 @@ public interface JwtGeneratorService {
     boolean validateRefreshToken(String token);
     String getUsernameFromToken(String token);
 
+    void storeTokenInRedis(String token, String type, long expirationTimeInSeconds);
+
 
 }
