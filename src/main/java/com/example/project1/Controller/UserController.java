@@ -121,7 +121,7 @@ public class UserController {
 
         if (token != null && jwtGeneratorService.validateToken(token)) {
 
-            tokenBlacklistService.addTokenToBlacklist(token, 600);//新增redis
+            tokenBlacklistService.addTokenToBlacklist(token, 60);//新增redis
             String Key = "accessToken:" + token;
             boolean deleted = redisTemplate.delete(Key);
             if (deleted){

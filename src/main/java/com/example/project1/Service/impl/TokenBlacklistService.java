@@ -23,7 +23,7 @@ public class TokenBlacklistService {
     public void addTokenToBlacklist(String token, long expirationTimeInSeconds) {
         logger.debug("Adding token to blacklist: " + token);
         String key = "blacklist:" + token;
-        redisTemplate.opsForValue().set(key, String.valueOf(true));
+        redisTemplate.opsForValue().set(key, String.valueOf(true),expirationTimeInSeconds,TimeUnit.SECONDS);
         //redisTemplate.expire(BlackList_KEY, expirationTimeInSeconds, TimeUnit.SECONDS);
         //redisTemplate.opsForSet().add(BlackList_KEY , token);
         //blacklist.add(token);
