@@ -140,20 +140,37 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 
 docker hub 連結 : https://hub.docker.com/repository/docker/kellylin1050/project1
 
-### 使用工具
-| 套件                | 敘述                              |
-| ------------------- | --------------------------------- |
-| lombok              | 註解自動生成getter&setter       |
-| junit               | 測試框架                       |
-| jjwt-api            | 所有的API接口，用於創建&解析API   |
-| jjwt-impl           | API的具體實現，提供jwt操作功能    |
-| jjwt-jackson        | 使用jackson來處理jwt的功        |
-| mariadb-java-client | mariadb的jdbc驅動，用於連接資料庫 |
-| HiKaricp            | 管理數據庫連接，提高性能          |
-| mybatis             | 簡化mybatis配置                |
-| swagger-ui          | 產生UI介面，提供API文件及測試     |
-| Docker              | 打包成映像檔                   |
+### Redis
+**安裝Redis**
 
+設定application.properties
+```
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+```
+把JWT token 存入Redis
+```
+redis-cli KEYS * //查詢所有Key
+redis-cli TTL accessToken:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyNDIyNjAyNiwiZXhwIjoxNzI0MjI5NjI2fQ.HXyOvs8uh6o9L1VH5KhOrm_Hky4537b09sPP10H4xas
+(integer) 3522  //查詢Key存活時間
+```
+
+
+
+### 使用工具
+| 套件                  | 敘述                     |
+|---------------------|------------------------|
+| lombok              | 註解自動生成getter&setter    |
+| junit               | 測試框架                   |
+| jjwt-api            | 所有的API接口，用於創建&解析API    |
+| jjwt-impl           | API的具體實現，提供jwt操作功能     |
+| jjwt-jackson        | 使用jackson來處理jwt的功      |
+| mariadb-java-client | mariadb的jdbc驅動，用於連接資料庫 |
+| HiKaricp            | 管理數據庫連接，提高性能           |
+| mybatis             | 簡化mybatis配置            |
+| swagger-ui          | 產生UI介面，提供API文件及測試      |
+| Docker              | 打包成映像檔                 |
+| Redis               | 存入JWT Token            |
 ## API說明
 
 ### [使用者 User](#User)
@@ -270,6 +287,7 @@ Successfully logged out
 | ----------- | -------- |
 | 200         | 登出成功 |
 | 400         | 無效的認證令牌|
+| 500         | 無法刪除令牌   |
 
 
 #### 查詢所有使用者
