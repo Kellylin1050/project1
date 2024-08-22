@@ -163,9 +163,10 @@ redis-cli TTL accessToken:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyN
 ### Jaspersoft Studio
 **安裝Jaspersoft Studio**
 
-:::info
-目前無法解決~還在努力中!
-:::
+<div style="background-color: lightcyan; padding: 10px; border-radius: 5px;" >
+<strong>info:</strong>目前無法解決~還在努力中!
+</div>
+
 
 ### 使用工具
 | 套件             | 敘述                     |

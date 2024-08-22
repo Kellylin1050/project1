@@ -37,7 +37,7 @@ public class ReportService {
         JRDataSource booksDataSource = new JRBeanCollectionDataSource(books);
 
         // 加載報表模板
-        InputStream reportStream = getClass().getResourceAsStream("/user_role_book_report.jrxml");
+        InputStream reportStream = getClass().getResourceAsStream("JasperReport/user_role_book_report.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
         // 設定報表參數
