@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
+import java.awt.print.Book;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,10 @@ public interface NewBookRepository extends JpaRepository<NewBook,Integer> {
     @Transactional
     @Query("UPDATE NewBook nb SET nb.title = :title, nb.author = :author, nb.description = :description ,nb.price = :price ,nb.sellprice = :sellprice WHERE nb.id = :id")
     int updateNewBook(Integer id, String title, String author, String description, Integer price, Integer sellprice );
+
+    @Query("SELECT b FROM NewBook b")
+    List<NewBook> findAllBook();
+
 }
 
 

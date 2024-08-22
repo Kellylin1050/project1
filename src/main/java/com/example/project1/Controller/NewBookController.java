@@ -2,7 +2,10 @@ package com.example.project1.Controller;
 
 import com.example.project1.Dao.NewBookRepository;
 import com.example.project1.Dto.NewBookRequest;
+import com.example.project1.Dto.NewBookResponse;
+import com.example.project1.Dto.UserResponse;
 import com.example.project1.Entity.NewBook;
+import com.example.project1.Entity.Role;
 import com.example.project1.Entity.User;
 import com.example.project1.Service.NewBookService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Tag(name = "Book管理",description = "管理Book的相關API")
 @RestController
@@ -62,6 +66,37 @@ public class NewBookController {
                     .body("An error occurred: " + e.getMessage());
         }
     }
+
+    @Operation(
+            summary = "查詢所有書籍",
+            description = "返回所有書籍的詳細訊息。",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "成功返回所有書籍"),
+                    @ApiResponse(responseCode = "404", description = "未找到書籍")
+            }
+    )
+    @GetMapping("/doFindAllBooks")
+    public ResponseEntity<Object> doFindAllBooks(Model model) {
+        List<NewBook> book = newBookService.findAllBook();
+        if (!book.isEmpty()) {
+            List<NewBookResponse> newBookResponses = book.stream()
+                    .map(book1 -> new NewBookResponse(
+                            book1.getTitle(),
+                            book1.getAuthor(),
+                            book1.getDescription(),
+                            book1.getPrice(),
+                            book1.getSellprice()
+                    ))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("u", newBookResponses);
+            return ResponseEntity.status(HttpStatus.OK).body(newBookResponses);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("未找到書籍");
+        }
+    }
+
+
 
     @Operation(
             summary = "更新書的訊息",

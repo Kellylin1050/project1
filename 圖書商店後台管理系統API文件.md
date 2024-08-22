@@ -20,6 +20,8 @@ Content-Type: application/json
 1. 註冊、登入、忘記密碼則是沒有權限限制
 ### 書籍管理API
 只有管理員可以對書本新增、修改、刪除，一般使用者只能查詢書本
+### 報表輸出API
+只有管理員可以輸出報表
 
 
 ### JWT token
@@ -71,6 +73,9 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 ### 文檔和維護
 - **API 文檔**: Swagger
 - **維護計劃**: 定期檢查和更新
+
+### 報表輸出
+- **報表檔**: Jaspersoft Studio
 
 ### MariaDB資料庫(設計、關聯、索引)
 ### 資料表設計
@@ -155,22 +160,28 @@ redis-cli TTL accessToken:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyN
 (integer) 3522  //查詢Key存活時間
 ```
 
+### Jaspersoft Studio
+**安裝Jaspersoft Studio**
 
+:::info
+目前無法解決~還在努力中!
+:::
 
 ### 使用工具
-| 套件                  | 敘述                     |
-|---------------------|------------------------|
-| lombok              | 註解自動生成getter&setter    |
-| junit               | 測試框架                   |
-| jjwt-api            | 所有的API接口，用於創建&解析API    |
-| jjwt-impl           | API的具體實現，提供jwt操作功能     |
-| jjwt-jackson        | 使用jackson來處理jwt的功      |
+| 套件             | 敘述                     |
+|----------------|------------------------|
+| lombok         | 註解自動生成getter&setter    |
+| junit          | 測試框架                   |
+| jjwt-api       | 所有的API接口，用於創建&解析API    |
+| jjwt-impl      | API的具體實現，提供jwt操作功能     |
+| jjwt-jackson   | 使用jackson來處理jwt的功      |
 | mariadb-java-client | mariadb的jdbc驅動，用於連接資料庫 |
-| HiKaricp            | 管理資料庫連接，提高性能           |
-| mybatis             | 簡化mybatis配置            |
-| swagger-ui          | 產生UI介面，提供API文件及測試      |
-| Docker              | 打包成映像檔                 |
-| Redis               | 存入JWT Token            |
+| HiKaricp       | 管理資料庫連接，提高性能           |
+| mybatis        | 簡化mybatis配置            |
+| swagger-ui     | 產生UI介面，提供API文件及測試      |
+| Docker         | 打包成映像檔                 |
+| Redis          | 存入JWT Token            |
+| Jaspersoft Studio               | 輸出PDF檔&Excel檔案         |
 ## API說明
 
 ### [使用者 User](#User)
@@ -193,13 +204,20 @@ redis-cli TTL accessToken:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyN
 ### [管理書籍 BOOK](#Book)
 
 
-| Description                   | Method | Path                     | ROLE  |
-| ----------------------------- | ------ | ------------------------ | ----- |
-| [查詢書籍](#查詢書籍)         | GET    | /NewBook/book            |       |
+| Description       | Method | Path                     | ROLE  |
+|-------------------| ------ |--------------------------| ----- |
+| [查詢指定書籍](#查詢指定書籍) | GET    | /NewBook/book            |       |
+| [查詢所有書籍](#查詢所有書籍) | GET    | /NewBook/doFindAllBooks  |       |
 | [更新書的訊息](#更新書的訊息) | POST   | /NewBook/doUpdateNewBook | ADMIN |
-| [新增書籍](#新增書籍)         | POST   | /NewBook/doSaveNewBook   | ADMIN |
-| [刪除書籍](#刪除書籍)         | POST   | /NewBook/delete/{id}     | ADMIN |
-| [403錯誤頁面](#錯誤頁面)      |        | /NewBook/403             |       |
+| [新增書籍](#新增書籍)     | POST   | /NewBook/doSaveNewBook   | ADMIN |
+| [刪除書籍](#刪除書籍)     | POST   | /NewBook/delete/{id}     | ADMIN |
+| [403錯誤頁面](#錯誤頁面)  |        | /NewBook/403             |       |
+
+### [報表輸出 Report](#Report)
+| Description   | Method | Path           | ROLE  |
+|---------------| ------ |----------------|-------|
+| [輸出報表](#輸出報表) | GET    | /report/export | ADMIN |
+
 
 ## API Details
 
@@ -235,6 +253,7 @@ Response Example
 使用者 Sandra_lin 註冊成功
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述 |
 | ----------- | -------- |
 | 201         | 使用者註冊成功 |
@@ -242,6 +261,7 @@ Response Example
 
 #### 使用者登入
 Request Example
+
 | 參數名稱 | 必要 | 資料型態    | 參數敘述    |
 | -------- | ---- | ----------- | --- |
 | password | Y    | String(255) | 密碼    |
@@ -254,6 +274,7 @@ Request Example
 }
 ```
 Response Example
+
 | 參數名稱 | 必要 | 資料型態    | 參數敘述    |
 | -------- | ---- | ----------- | --- |
 | token | Y    | String(255) | jwt token   |
@@ -374,6 +395,7 @@ Response Example
 ]
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述 |
 | ----------- | -------- |
 | 200         | 成功返回所有使用者 |
@@ -382,6 +404,7 @@ Response Example
 #### 查詢指定使用者
 
 Request Example
+
 | 參數名稱 | 必要 | 資料型態    | 參數敘述    |
 | -------- | ---- | ----------- | --- |
 | username | Y    | String(255) | 使用者名稱|
@@ -395,6 +418,7 @@ Request Example
 **Example**: `Sandra_lin`
 
 Response Example
+
 | 參數名稱 | 必要 | 資料型態    | 參數敘述    |
 | -------- | ---- | ----------- | --- |
 | name     | Y    | String(255) | 姓名    |
@@ -413,6 +437,7 @@ Response Example
 }
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 成功返回使用者 |
@@ -443,6 +468,7 @@ Response Example
 USER Diana updated successfully
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 使用者更新成功 |
@@ -478,6 +504,7 @@ Request Example
 }
 ```
 Response Example
+
 | 參數名稱 | 必要 | 資料型態    | 參數敘述   |
 | -------- | ---- | ----------- | ---------- |
 | message  | Y    | String(255) | 回應訊息   |
@@ -509,6 +536,7 @@ Response Example
 }
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 201         | 使用者創建成功 |
@@ -516,6 +544,7 @@ Response Example
 #### 刪除使用者
 
 Request Example
+
 | 參數名稱 | 必要 | 資料型態 | 參數敘述 |
 | -------- | ---- | -------- | -------- |
 | ID       | Y    | INT(11)  | 使用者ID |
@@ -535,6 +564,7 @@ Response Example
 User with ID 19 deleted successfully
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 使用者刪除成功 |
@@ -543,6 +573,7 @@ User with ID 19 deleted successfully
 #### 更新Token
 
 Request Example
+
 | 參數名稱     | 必要 | 資料型態    | 參數敘述  |
 | ------------ | ---- | ----------- | --------- |
 | refreshToken | Y    | String(255) | 登入時獲得的更新Token |
@@ -552,6 +583,7 @@ Request Example
 }
 ```
 Response Example
+
 | 參數名稱     | 必要 | 資料型態    | 參數敘述              |
 | ------------ | ---- | ----------- | --------------------- |
 | accessToken  | Y    | String(255) | 新的有效Token        |
@@ -564,6 +596,7 @@ Response Example
 }
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述      |
 | ----------- | ------------- |
 | 200         | 成功更新Token |
@@ -573,6 +606,7 @@ Response Example
 
 #### 忘記密碼
 重新設定密碼
+
 | 參數名稱 | 必要 | 資料型態    | 參數敘述   |
 | -------- | ---- | ----------- | ---------- |
 | id       | Y    | INT(11)     | 使用者ID    |
@@ -591,14 +625,16 @@ Response Example
 Password reset successfully
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 密碼重製成功 |
 | 400         | 使用者未找到或重置密碼失敗   |
 ### Book
 
-#### 查詢書籍
+#### 查詢指定書籍
 Request Example
+
 | 參數名稱 | 必要 | 資料型態 | 參數敘述 |
 | -------- | ---- | -------- | -------- |
 | title    | Y    | String(255)  | 書名 |
@@ -618,13 +654,60 @@ Response Example
 Successfully found the book : Java Programming
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 成功返回書名 |
 | 404         | 書籍未找到   |
 | 500         | 伺服器錯誤     |
+
+####查詢所有書籍
+
+Response Example
+```json=
+[
+  {
+    "title": "Java Programming",
+    "author": "John Doe",
+    "description": "一本關於java的指南",
+    "price": 500,
+    "sellprice": 520
+  },
+  {
+    "title": "Slow Dance",
+    "author": "Rainbow Rowell",
+    "description": "Shiloh questions if Kerry still wants to reconnect after all the time and changes.",
+    "price": 600,
+    "sellprice": 550
+  },
+  {
+    "title": "Slow Dance",
+    "author": "Rainbow Rowell",
+    "description": "Shiloh questions if Kerry still wants to reconnect after all the time and changes.",
+    "price": 600,
+    "sellprice": 550
+  },
+  {
+    "title": "Slow Dance",
+    "author": "Rainbow Rowell",
+    "description": "Shiloh questions if Kerry still wants to reconnect after all the time and changes.",
+    "price": 600,
+    "sellprice": 550
+  }
+]
+```
+
+**API回應說明**
+
+| HTTP status | 中文敘述       |
+| ----------- | -------------- |
+| 200         | 成功返回所有書籍 |
+| 404         | 未找到書籍   |
+
+
 #### 更新書的訊息
 Request Example
+
 | 參數名稱    | 必要 | 資料型態    | 參數敘述 |
 | ----------- | ---- | ----------- | -------- |
 | id          | Y    | INT(11)     | 書籍ID   |
@@ -650,6 +733,7 @@ Response Example
 Book updated successfully
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 成功更新書籍 |
@@ -657,6 +741,7 @@ Book updated successfully
 
 #### 新增書籍
 Request Example
+
 | 參數名稱    | 必要 | 資料型態    | 參數敘述 |
 | ----------- | ---- | ----------- | -------- |
 | id          | Y    | INT(11)     | 書籍ID   |
@@ -682,12 +767,14 @@ Response Example
 Book save successfully
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 201         | 書籍創建成功 |
 | 500         | 伺服器錯誤  |
 #### 刪除書籍
 Request Example
+
 | 參數名稱 | 必要 | 資料型態 | 參數敘述 |
 | -------- | ---- | -------- | -------- |
 | ID       | Y    | INT(11)  | 書籍ID |
@@ -707,7 +794,23 @@ Response Example
 Book with ID 5 deleted successfully
 ```
 **API回應說明**
+
 | HTTP status | 中文敘述       |
 | ----------- | -------------- |
 | 200         | 書籍刪除成功 |
 | 404         | 書籍未找到   |
+
+
+#### 輸出報表
+
+Response Example
+
+```json=
+
+```
+**API回應說明**
+
+| HTTP status | 中文敘述   |
+|-------------|--------|
+| 200         | 成功輸出報表 |
+| 500         | 報表輸出失敗 |

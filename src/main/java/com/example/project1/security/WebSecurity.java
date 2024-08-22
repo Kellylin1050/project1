@@ -70,6 +70,7 @@ public class WebSecurity {
                         .requestMatchers("/users/logout").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/NewBook/delete/**").hasRole("ADMIN")
                         .requestMatchers("/NewBook/book").permitAll()
+                        .requestMatchers("/NewBook/doFindAllBooks").permitAll()
                         .requestMatchers("/NewBook/doUpdateNewbook").hasRole("ADMIN")
                         .requestMatchers("/NewBook/doSaveNewbook").hasRole("ADMIN")
                         .anyRequest().authenticated())

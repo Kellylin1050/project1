@@ -3,6 +3,7 @@ package com.example.project1.Service.impl;
 import com.example.project1.Dao.NewBookRepository;
 import com.example.project1.Dto.NewBookRequest;
 import com.example.project1.Entity.NewBook;
+import com.example.project1.Entity.User;
 import com.example.project1.Service.NewBookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,10 @@ public class NewBookServiceImpl implements NewBookService {
     public NewBook getNewBookByTitle(String title) {
         return newBookRepository.getNewBookByTitle(title);
 
+    }
+    @Override
+    public List<NewBook> findAllBook() {
+        return newBookRepository.findAllBook();
     }
 
     @Override

@@ -16,4 +16,6 @@ public interface NewBookService {
     NewBook getNewBookByTitle(String title);
 
     boolean existsById(Integer id);
+
+    List<NewBook> findAllBook();
 }
