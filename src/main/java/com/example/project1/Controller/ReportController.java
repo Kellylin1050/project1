@@ -1,14 +1,10 @@
 package com.example.project1.Controller;
 
-import com.example.project1.Entity.NewBook;
-import com.example.project1.Service.NewBookService;
 import com.example.project1.Service.impl.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import net.sf.jasperreports.engine.JRException;
-import org.checkerframework.checker.units.qual.N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,10 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/report")
 public class ReportController {
-
+    @Autowired
     private ReportService reportService;
-
-
 
     public ReportController(ReportService reportService){
         this.reportService = reportService;
@@ -51,5 +45,4 @@ public class ReportController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
 }
