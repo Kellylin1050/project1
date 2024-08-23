@@ -14,11 +14,54 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Tag(name = "Report輸出",description = "JasperReports報表輸出")
 @RestController
 @RequestMapping("/report")
 public class ReportController {
-    @Autowired
+
+    private final ReportService reportService;
+
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
+
+    @GetMapping("/generateReport")
+    public ResponseEntity<byte[]> generateReport(@RequestParam String customerName,
+                                                 @RequestParam String supplierName,
+                                                 @RequestParam String shipNum,
+                                                 @RequestParam String orderId,
+                                                 @RequestParam String logo,
+                                                 @RequestParam String orderMemo,
+                                                 @RequestParam String format) {
+        try {
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("customerName", customerName);
+            parameters.put("supplierName", supplierName);
+            parameters.put("shipNum", shipNum);
+            parameters.put("orderId", orderId);
+            parameters.put("logo", logo);
+            parameters.put("orderMemo", orderMemo);
+
+            byte[] report = reportService.generateReport("shipOrderDetailReport", parameters, format);
+
+            HttpHeaders headers = new HttpHeaders();
+            if ("pdf".equalsIgnoreCase(format)) {
+                headers.add("Content-Disposition", "inline; filename=shipOrderDetailReport.pdf");
+                return ResponseEntity.ok().headers(headers).body(report);
+            } else if ("xlsx".equalsIgnoreCase(format)) {
+                headers.add("Content-Disposition", "inline; filename=shipOrderDetailReport.xlsx");
+                return ResponseEntity.ok().headers(headers).body(report);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    /*@Autowired
     private ReportService reportService;
 
     public ReportController(ReportService reportService){
@@ -44,5 +87,5 @@ public class ReportController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-    }
+    }*/
 }
