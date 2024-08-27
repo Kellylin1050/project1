@@ -58,6 +58,7 @@ public class WebSecurity {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers("/report/generateReport").permitAll()
+                        //.requestMatchers("/report/export").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/users/forgetpassword").permitAll()
                         .requestMatchers("/users/register").permitAll()

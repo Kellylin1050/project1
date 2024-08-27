@@ -181,10 +181,9 @@
         </dependency>
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports-jdt</artifactId>
+            <artifactId>jasperreports-pdf</artifactId>
             <version>7.0.0</version>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -206,17 +205,17 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.0.0</version>
-                        <configuration>
-                            <imageName>project1</imageName>
-                            <dockerDirectory>D:\程式語言\intellij-java\project1</dockerDirectory>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>D:\程式語言\intellij-java\project1\project1\target</directory>
-                                    <include>project1-0.0.1-SNAPSHOT.jar</include>
-                                </resource>
-                            </resources>
-                        </configuration>
+                <configuration>
+                    <imageName>project1</imageName>
+                    <dockerDirectory>D:\程式語言\intellij-java\project1</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>D:\程式語言\intellij-java\project1\project1\target</directory>
+                            <include>project1-0.0.1-SNAPSHOT.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

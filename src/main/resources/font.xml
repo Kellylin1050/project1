@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+    <fontFamily name="微軟正黑體">
+        <normal>font/msjh.ttf</normal>
+        <bold>font/msjh.ttf</bold>
+        <italic>font/msjh.ttf</italic>
+        <boldItalic>font/msjh.ttf</boldItalic>
+        <pdfEncoding>Identity-H</pdfEncoding>
+        <pdfEmbedded>true</pdfEmbedded>
+        <exportFonts>
+            <export key = "net.sf.jasperreports.html">'微軟正黑體', Arial, Helvetica, sans-serif</export>
+            <export key = "net.sf.jasperreports.xhtml">'微軟正黑體', Arial, Helvetica, sans-serif</export>
+        </exportFonts>
+    </fontFamily>
+</fontFamilies>

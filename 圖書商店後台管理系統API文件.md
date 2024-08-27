@@ -3,6 +3,7 @@
 ## 系統簡介
 系統主要由 RESTful API 組成，支持用戶認證、權限管理、員工資料管理和書本管理等功能。系統採用 JWT 驗證，用於保護 API，並使用 Swagger 生成的文檔來幫助開發者了解和測試 API。
 
+swagger url : http://localhost:8080/swagger-ui/index.html#/Report%E8%BC%B8%E5%87%BA/generateReport
 ## 基本訊息
 API Base URL: /v3/api-docs
 
@@ -143,7 +144,7 @@ Token過期可以使用refreshToken來刷新Token，過期時間預設為7天
 
 `$ docker tag local-image:tagname new-repo:tagname .`使用docker push推送到hub
 
-docker hub 連結 : https://hub.docker.com/repository/docker/kellylin1050/project1
+docker hub url : https://hub.docker.com/repository/docker/kellylin1050/project1
 
 ### Redis
 **安裝Redis**
@@ -164,7 +165,7 @@ redis-cli TTL accessToken:eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcyN
 **安裝Jaspersoft Studio**
 
 <div style="background-color: lightcyan; padding: 10px; border-radius: 5px;" >
-<strong>info:</strong>目前無法解決~還在努力中!
+<strong>目前無法解決~還在努力中!</strong>
 </div>
 
 
